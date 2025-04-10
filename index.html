@@ -6,6 +6,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Gamemaster's Garage</title>
   <style>
+	
+.product-hover {
+  position: relative;
+  display: inline-block;
+}
+
+.popup {
+  visibility: hidden;
+  width: 220px;
+  background-color: #333;
+  color: #fff;
+  text-align: left;
+  padding: 10px;
+  border-radius: 6px;
+  position: absolute;
+  bottom: 110%; /* position above the image */
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.product-hover:hover .popup {
+  visibility: visible;
+  opacity: 1;
+}
+
     body {
       font-family: 'League Spartan', sans-serif;
       background-color: #f8f0e3;
@@ -82,13 +110,50 @@
     <!-- Example Product -->
 
     <div class="product">
-      <img src="GG_HandbookOfHaunting_Thumbnail_01.jpg" alt="Handbook of Hauntings">
-      <h3>Handbook of Hauntings</h3>
-      <div class="links">
-        <a href="https://www.drivethrurpg.com">DriveThruRPG</a>
-        <a href="https://itch.io">itch.io</a>
-      </div>
+  <div class="product-hover">
+    <img src="GG_HandbookOfHaunting_Thumbnail_01.jpg" alt="Handbook of Hauntings">
+    <div class="popup">
+      <strong>Handbook of Hauntings</strong><br>
+      A spine-chilling collection of supernatural encounters and cursed relics for your tabletop RPGs.
     </div>
+  </div>
+  <h3>Handbook of Hauntings</h3>
+  <div class="links">
+    <a href="https://www.drivethrurpg.com">DriveThruRPG</a>
+    <a href="https://itch.io">itch.io</a>
+  </div>
+</div>
+
+    <div class="product">
+  <div class="product-hover">
+    <img src="GG_HandbookOfHaunting_Thumbnail_01.jpg" alt="Handbook of Hauntings">
+    <div class="popup">
+      <strong>Handbook of Hauntings</strong><br>
+      A spine-chilling collection of supernatural encounters and cursed relics for your tabletop RPGs.
+    </div>
+  </div>
+  <h3>Handbook of Hauntings</h3>
+  <div class="links">
+    <a href="https://www.drivethrurpg.com">DriveThruRPG</a>
+    <a href="https://itch.io">itch.io</a>
+  </div>
+</div>
+
+    <div class="product">
+  <div class="product-hover">
+    <img src="GG_HandbookOfHaunting_Thumbnail_01.jpg" alt="Handbook of Hauntings">
+    <div class="popup">
+      <strong>Handbook of Hauntings</strong><br>
+      A spine-chilling collection of supernatural encounters and cursed relics for your tabletop RPGs.
+    </div>
+  </div>
+  <h3>Handbook of Hauntings</h3>
+  <div class="links">
+    <a href="https://www.drivethrurpg.com">DriveThruRPG</a>
+    <a href="https://itch.io">itch.io</a>
+  </div>
+</div>
+
 
   </section>
 </body>
