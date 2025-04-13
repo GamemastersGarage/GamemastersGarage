@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <link href="https://fonts.googleapis.com/css2?family=League+Spartan&display=swap" rel="stylesheet">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gamemaster's Garage</title>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan&display=swap" rel="stylesheet" />
   <style>
     body {
       font-family: 'League Spartan', sans-serif;
@@ -14,12 +14,15 @@
       padding: 0;
       text-align: center;
     }
+
     header {
       padding: 40px 20px;
     }
+
     header img {
       max-width: 150px;
     }
+
     h1 {
       font-size: 2em;
       margin: 20px 0;
@@ -45,17 +48,15 @@
       background-color: #333;
     }
 
-    .modal {
+    .modal, .gallery-modal {
       display: none;
       position: fixed;
       z-index: 1000;
-      padding-top: 60px;
-      left: 0;
       top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.6);
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.6);
     }
 
     .modal-content {
@@ -70,15 +71,42 @@
       position: relative;
     }
 
-    .close-button {
-      color: #000;
-      position: absolute;
-      top: 10px;
-      right: 16px;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
+    .gallery-modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+
+    .gallery-content {
+      background-color: #f8f0e3;
+      height: 80vh;
+      width: 90vw;
+      max-width: 400px;
+      padding: 20px;
+      position: relative;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-y: auto;
+    }
+
+.close-button {
+  color: #000;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 9999; /* Ensure it's above arrows */
+  background-color: #f8f0e3; /* Optional: for better tap targeting on mobile */
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
 
     .product-grid {
       display: flex;
@@ -87,18 +115,23 @@
       gap: 40px;
       padding: 40px 20px;
     }
+
     .product {
       max-width: 200px;
+      cursor: pointer;
     }
+
     .product img {
       width: 100%;
       height: auto;
       border: 1px solid #ccc;
     }
+
     .product h3 {
       font-size: 1em;
       margin: 10px 0 5px;
     }
+
     .links a {
       display: block;
       color: #000;
@@ -106,58 +139,70 @@
       margin: 2px 0;
     }
 
-    .product-hover {
-      position: relative;
-      display: inline-block;
+    .gallery-image {
+      max-height: 60%;
+      height: auto;
+      max-width: 100%;
+      margin-bottom: 20px;
+      object-fit: contain;
     }
 
-    .popup {
-      visibility: hidden;
-      width: 220px;
-      background-color: #333;
-      color: #fff;
+    .gallery-description {
       text-align: left;
-      padding: 10px;
-      border-radius: 6px;
+      max-width: 100%;
+      margin-top: 10px;
+    }
+
+    .gallery-nav {
       position: absolute;
-      bottom: 110%;
-      left: 50%;
-      transform: translateX(-50%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: 1;
+      top: 0;
+      bottom: 0;
+      width: 60px;
+      font-size: 40px;
+      font-weight: bold;
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      z-index: 2;
     }
 
-    .product-hover:hover .popup {
-      visibility: visible;
-      opacity: 1;
+    .left-arrow {
+      left: 0px;
     }
+
+    .right-arrow {
+      right: 0px;
+    }
+
     .contact-email {
-  font-size: 14px;
-  margin-top: 10px;
-  color: #333;
-}
+      font-size: 14px;
+      margin-top: 10px;
+      color: #333;
+    }
 
-.contact-email a {
-  color: #000;
-  text-decoration: underline;
-}
-
+    .contact-email a {
+      color: #000;
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
   <header>
     <picture>
-  <source srcset="GamemastersGarage_Logo_WEBP_512x.webp" type="image/webp">
-  <img src="GamemastersGarage_Logo_PNG_512x.png" alt="Gamemaster's Garage Logo" width="150">
-</picture>
+      <source srcset="GamemastersGarage_Logo_WEBP_512x.webp" type="image/webp">
+      <img src="GamemastersGarage_Logo_PNG_512x.png" alt="Gamemaster's Garage Logo" width="150" />
+    </picture>
     <h1>Makers of quality TTRPG tools</h1>
 
-<div class="signup">
-  <button id="openForm" class="form-button">Join Our Mailing List</button>
-  <p class="contact-email">or reach out: <a href="mailto:info@gamemastersgarage.com">info@gamemastersgarage.com</a></p>
-</div>
-    <!-- Modal -->
+    <div class="signup">
+      <button id="openForm" class="form-button">Join Our Mailing List</button>
+      <p class="contact-email">or reach out: <a href="mailto:info@gamemastersgarage.com">info@gamemastersgarage.com</a></p>
+    </div>
+
+    <!-- Mailing List Modal -->
     <div id="formModal" class="modal">
       <div class="modal-content">
         <span class="close-button">&times;</span>
@@ -169,208 +214,137 @@
         </iframe>
       </div>
     </div>
+
+    <!-- Gallery Modal -->
+    <div id="galleryModal" class="gallery-modal">
+      <div class="gallery-content">
+        <span class="close-button" id="closeGallery">&times;</span>
+        <div class="gallery-nav left-arrow" id="prevProduct">&#10094;</div>
+        <div class="gallery-nav right-arrow" id="nextProduct">&#10095;</div>
+        <img id="galleryImage" class="gallery-image" src="" alt="" />
+        <div class="gallery-description" id="galleryDescription"></div>
+      </div>
+    </div>
   </header>
 
-  <section class="product-grid">
-    <div class="product">
-      <div class="product-hover">
-        <img src="GG_HandbookOfHaunting_Thumbnail_01.jpg" alt="Handbook of Hauntings">
-        <div class="popup">
-          <strong>Handbook of Hauntings</strong><br>
-          A spine-chilling collection of supernatural encounters and cursed relics for your tabletop RPGs.
-        </div>
-      </div>
-      <h3>Handbook of Hauntings</h3>
-      <div class="links">
-        <a href="https://www.drivethrurpg.com">DriveThruRPG</a>
-        <a href="https://itch.io">itch.io</a>
-      </div>
-    </div>
-
-    <div class="product">
-      <div class="product-hover">
-        <img src="GG_HandbookOfHaunting_Thumbnail_01.jpg" alt="Handbook of Hauntings">
-        <div class="popup">
-          <strong>Handbook of Hauntings</strong><br>
-          A spine-chilling collection of supernatural encounters and cursed relics for your tabletop RPGs.
-        </div>
-      </div>
-      <h3>Handbook of Hauntings</h3>
-      <div class="links">
-        <a href="https://www.drivethrurpg.com">DriveThruRPG</a>
-        <a href="https://itch.io">itch.io</a>
-      </div>
-    </div>
-
-    <div class="product">
-      <div class="product-hover">
-        <img src="GG_HandbookOfHaunting_Thumbnail_01.jpg" alt="Handbook of Hauntings">
-        <div class="popup">
-          <strong>Handbook of Hauntings</strong><br>
-          A spine-chilling collection of supernatural encounters and cursed relics for your tabletop RPGs.
-        </div>
-      </div>
-      <h3>Handbook of Hauntings</h3>
-      <div class="links">
-        <a href="https://www.drivethrurpg.com">DriveThruRPG</a>
-        <a href="https://itch.io">itch.io</a>
-      </div>
-    </div>
-
-    <div class="product">
-      <div class="product-hover">
-        <img src="GG_HandbookOfHaunting_Thumbnail_01.jpg" alt="Handbook of Hauntings">
-        <div class="popup">
-          <strong>Handbook of Hauntings</strong><br>
-          A spine-chilling collection of supernatural encounters and cursed relics for your tabletop RPGs.
-        </div>
-      </div>
-      <h3>Handbook of Hauntings</h3>
-      <div class="links">
-        <a href="https://www.drivethrurpg.com">DriveThruRPG</a>
-        <a href="https://itch.io">itch.io</a>
-      </div>
-    </div>
-
-      <div class="product">
-      <div class="product-hover">
-        <img src="GG_HandbookOfHaunting_Thumbnail_01.jpg" alt="Handbook of Hauntings">
-        <div class="popup">
-          <strong>Handbook of Hauntings</strong><br>
-          A spine-chilling collection of supernatural encounters and cursed relics for your tabletop RPGs.
-        </div>
-      </div>
-      <h3>Handbook of Hauntings</h3>
-      <div class="links">
-        <a href="https://www.drivethrurpg.com">DriveThruRPG</a>
-        <a href="https://itch.io">itch.io</a>
-      </div>
-    </div>
-
-    <div class="product">
-      <div class="product-hover">
-        <img src="GG_HandbookOfHaunting_Thumbnail_01.jpg" alt="Handbook of Hauntings">
-        <div class="popup">
-          <strong>Handbook of Hauntings</strong><br>
-          A spine-chilling collection of supernatural encounters and cursed relics for your tabletop RPGs.
-        </div>
-      </div>
-      <h3>Handbook of Hauntings</h3>
-      <div class="links">
-        <a href="https://www.drivethrurpg.com">DriveThruRPG</a>
-        <a href="https://itch.io">itch.io</a>
-      </div>
-    </div>
-
-    <div class="product">
-      <div class="product-hover">
-        <img src="GG_HandbookOfHaunting_Thumbnail_01.jpg" alt="Handbook of Hauntings">
-        <div class="popup">
-          <strong>Handbook of Hauntings</strong><br>
-          A spine-chilling collection of supernatural encounters and cursed relics for your tabletop RPGs.
-        </div>
-      </div>
-      <h3>Handbook of Hauntings</h3>
-      <div class="links">
-        <a href="https://www.drivethrurpg.com">DriveThruRPG</a>
-        <a href="https://itch.io">itch.io</a>
-      </div>
-    </div>
-
-    <div class="product">
-      <div class="product-hover">
-        <img src="GG_HandbookOfHaunting_Thumbnail_01.jpg" alt="Handbook of Hauntings">
-        <div class="popup">
-          <strong>Handbook of Hauntings</strong><br>
-          A spine-chilling collection of supernatural encounters and cursed relics for your tabletop RPGs.
-        </div>
-      </div>
-      <h3>Handbook of Hauntings</h3>
-      <div class="links">
-        <a href="https://www.drivethrurpg.com">DriveThruRPG</a>
-        <a href="https://itch.io">itch.io</a>
-      </div>
-    </div>
-
-        <div class="product">
-      <div class="product-hover">
-        <img src="GG_HandbookOfHaunting_Thumbnail_01.jpg" alt="Handbook of Hauntings">
-        <div class="popup">
-          <strong>Handbook of Hauntings</strong><br>
-          A spine-chilling collection of supernatural encounters and cursed relics for your tabletop RPGs.
-        </div>
-      </div>
-      <h3>Handbook of Hauntings</h3>
-      <div class="links">
-        <a href="https://www.drivethrurpg.com">DriveThruRPG</a>
-        <a href="https://itch.io">itch.io</a>
-      </div>
-    </div>
-
-    <div class="product">
-      <div class="product-hover">
-        <img src="GG_HandbookOfHaunting_Thumbnail_01.jpg" alt="Handbook of Hauntings">
-        <div class="popup">
-          <strong>Handbook of Hauntings</strong><br>
-          A spine-chilling collection of supernatural encounters and cursed relics for your tabletop RPGs.
-        </div>
-      </div>
-      <h3>Handbook of Hauntings</h3>
-      <div class="links">
-        <a href="https://www.drivethrurpg.com">DriveThruRPG</a>
-        <a href="https://itch.io">itch.io</a>
-      </div>
-    </div>
-
-    <div class="product">
-      <div class="product-hover">
-        <img src="GG_HandbookOfHaunting_Thumbnail_01.jpg" alt="Handbook of Hauntings">
-        <div class="popup">
-          <strong>Handbook of Hauntings</strong><br>
-          A spine-chilling collection of supernatural encounters and cursed relics for your tabletop RPGs.
-        </div>
-      </div>
-      <h3>Handbook of Hauntings</h3>
-      <div class="links">
-        <a href="https://www.drivethrurpg.com">DriveThruRPG</a>
-        <a href="https://itch.io">itch.io</a>
-      </div>
-    </div>
-
-    <div class="product">
-      <div class="product-hover">
-        <img src="GG_HandbookOfHaunting_Thumbnail_01.jpg" alt="Handbook of Hauntings">
-        <div class="popup">
-          <strong>Handbook of Hauntings</strong><br>
-          A spine-chilling collection of supernatural encounters and cursed relics for your tabletop RPGs.
-        </div>
-      </div>
-      <h3>Handbook of Hauntings</h3>
-      <div class="links">
-        <a href="https://www.drivethrurpg.com">DriveThruRPG</a>
-        <a href="https://itch.io">itch.io</a>
-      </div>
-    </div>
+  <section class="product-grid" id="productGrid">
+    <!-- Products will be injected here -->
   </section>
 
   <script>
-    const modal = document.getElementById("formModal");
-    const btn = document.getElementById("openForm");
-    const span = document.querySelector(".close-button");
-
-    btn.onclick = function() {
-      modal.style.display = "block";
-    }
-
-    span.onclick = function() {
-      modal.style.display = "none";
-    }
-
-    window.onclick = function(event) {
-      if (event.target === modal) {
-        modal.style.display = "none";
+    const products = [
+      {
+        name: "Handbook of Hauntings",
+        thumb: "GG_HandbookOfHaunting_Thumbnail_01.jpg",
+        large: "GG_HandbookOfHaunting_Thumbnail_01.jpg",
+        shortDesc: "Handbook of Hauntings",
+        longDesc: "A spine-chilling collection of supernatural encounters and cursed relics for your tabletop RPGs. Perfect for creating haunted campaigns or dropping creepy moments into any setting. Blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah",
+        links: [
+          { text: "DriveThruRPG", href: "https://www.drivethrurpg.com" },
+          { text: "itch.io", href: "https://itch.io" }
+        ]
+      },
+      {
+        name: "Handbook of Hauntings (Alt)",
+        thumb: "GG_HandbookOfHaunting_Thumbnail_01.jpg",
+        large: "GG_HandbookOfHaunting_Thumbnail_01.jpg",
+        shortDesc: "Handbook of Hauntings (Alt)",
+        longDesc: "A second haunting edition with even more cursed content. Bonus material includes spectral NPCs, haunted locales, and chilling dice mechanics.",
+        links: [
+          { text: "DriveThruRPG", href: "https://www.drivethrurpg.com" },
+          { text: "itch.io", href: "https://itch.io" }
+        ]
       }
+    ];
+
+    const grid = document.getElementById("productGrid");
+    const galleryModal = document.getElementById("galleryModal");
+    const galleryImage = document.getElementById("galleryImage");
+    const galleryDescription = document.getElementById("galleryDescription");
+
+    let currentIndex = 0;
+
+    function renderProducts() {
+      products.forEach((product, index) => {
+        const div = document.createElement("div");
+        div.className = "product";
+        div.innerHTML = `
+          <img src="${product.thumb}" alt="${product.name}">
+          <h3>${product.shortDesc}</h3>
+          <div class="links">
+            ${product.links.map(link => `<a href="${link.href}" target="_blank">${link.text}</a>`).join('')}
+          </div>
+        `;
+        div.addEventListener("click", () => openGallery(index));
+        grid.appendChild(div);
+      });
     }
+
+    function openGallery(index) {
+      currentIndex = index;
+      const product = products[index];
+      galleryImage.src = product.large;
+      galleryImage.alt = product.name;
+      galleryDescription.innerHTML = `
+        <h2>${product.name}</h2>
+        <p>${product.longDesc}</p>
+        <div class="links">
+          ${product.links.map(link => `<a href="${link.href}" target="_blank">${link.text}</a>`).join('')}
+        </div>
+      `;
+      galleryModal.classList.add("active");
+    }
+
+    function closeGallery() {
+      galleryModal.classList.remove("active");
+    }
+
+    function showPrevProduct() {
+      currentIndex = (currentIndex - 1 + products.length) % products.length;
+      openGallery(currentIndex);
+    }
+
+    function showNextProduct() {
+      currentIndex = (currentIndex + 1) % products.length;
+      openGallery(currentIndex);
+    }
+
+    document.getElementById("prevProduct").addEventListener("click", (e) => {
+      e.stopPropagation();
+      showPrevProduct();
+    });
+
+    document.getElementById("nextProduct").addEventListener("click", (e) => {
+      e.stopPropagation();
+      showNextProduct();
+    });
+
+    document.getElementById("closeGallery").addEventListener("click", closeGallery);
+
+    window.addEventListener("keydown", (e) => {
+      if (galleryModal.classList.contains("active")) {
+        if (e.key === "ArrowLeft") showPrevProduct();
+        if (e.key === "ArrowRight") showNextProduct();
+        if (e.key === "Escape") closeGallery();
+      }
+    });
+
+    galleryModal.addEventListener("click", (e) => {
+      if (e.target === galleryModal) closeGallery();
+    });
+
+    // Mailing List Modal
+    const formModal = document.getElementById("formModal");
+    const formBtn = document.getElementById("openForm");
+    const formCloseBtn = document.querySelector(".modal .close-button");
+
+    formBtn.onclick = () => formModal.style.display = "block";
+    formCloseBtn.onclick = () => formModal.style.display = "none";
+    window.onclick = (event) => {
+      if (event.target === formModal) formModal.style.display = "none";
+    };
+
+    renderProducts();
   </script>
 </body>
 </html>
