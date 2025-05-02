@@ -102,23 +102,24 @@
       line-height: 1.6;
     }
 
-    .inline-button {
-      display: inline-block;
-      background: none;
-      border: none;
-      font: inherit;
-      color: #444;
-      text-decoration: underline;
-      cursor: pointer;
-      padding: 0 2px;
-      margin: 0;
-      white-space: normal;
-      word-break: break-word;
-    }
+.inline-button {
+  display: inline-block;
+  background-color: #f0e9dc; /* light shade for contrast, matching your palette */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin: 0 2px;
+  font: inherit;
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
 
-    .inline-button:hover {
-      text-decoration: none;
-    }
+.inline-button:hover {
+  background-color: #e2dbce;
+}
+
 
     button.reroll-all {
       margin-top: 10px;
