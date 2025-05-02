@@ -123,8 +123,6 @@
     }
   </style>
 
-  <!-- Load base64 images first -->
-  <script src="images-base64.js"></script>
 </head>
 
 <body>
@@ -164,9 +162,6 @@
 
 <div id="pages"></div>
 
-<!-- Load jsPDF from CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <!-- Main App Script -->
 <script>
 const raceScales = {
@@ -180,9 +175,10 @@ const raceScales = {
   "bug": {w:1.3, h:1.3}
 };
 
-const weapons = Object.keys(images.weapon);
-const armours = Object.keys(images.armour);
-const races = Object.keys(images.head);
+// Just the names — no need to manage file paths manually
+const races = ["orc", "human", "elf", "dwarf", "demon", "halfling", "ogre", "bug"];
+const armours = ["steel", "loin-cloth", "robe"];
+const weapons = ["longsword", "axe", "hammer"];
 
 function addMiniatureInput() {
   const div = document.createElement('div');
@@ -197,13 +193,15 @@ function addMiniatureInput() {
   document.getElementById('controls').appendChild(div);
 }
 
-function loadImageFromBase64(base64OrArray) {
+function loadImage(path) {
   return new Promise((resolve) => {
     const img = new Image();
-    const src = Array.isArray(base64OrArray) ? base64OrArray[Math.floor(Math.random() * base64OrArray.length)] : base64OrArray;
-    img.src = src;
+    img.src = path;
     img.onload = () => resolve(img);
-    img.onerror = () => resolve(null);
+    img.onerror = () => {
+      console.warn(`Image failed to load: ${path}`);
+      resolve(null);
+    };
   });
 }
 
@@ -226,7 +224,7 @@ async function generate() {
     const quantity = parseInt(div.querySelector('.quantity').value);
 
     for (let i = 0; i < quantity; i++) {
-      miniatures.push({race, armour, weapon});
+      miniatures.push({ race, armour, weapon });
     }
   }
 
@@ -247,9 +245,9 @@ async function generate() {
     tempCanvas.height = h;
     const tempCtx = tempCanvas.getContext('2d');
 
-    const headImg = await loadImageFromBase64(images.head[miniature.race]);
-    const armourImg = await loadImageFromBase64(images.armour[miniature.armour]);
-    const weaponImg = await loadImageFromBase64(images.weapon[miniature.weapon]);
+    const headImg = await loadImage(`images/head/head_${miniature.race}.png`);
+    const armourImg = await loadImage(`images/armour/armour_${miniature.armour}.png`);
+    const weaponImg = await loadImage(`images/weapons/weapon_${miniature.weapon}.png`);
 
     if (armourImg) tempCtx.drawImage(armourImg, 0, 0, w, h);
     if (headImg) tempCtx.drawImage(headImg, 0, 0, w, h);
@@ -331,6 +329,7 @@ async function saveAsPDF() {
   pdf.save('miniatures.pdf');
 }
 </script>
+
 
 </body>
 </html>
