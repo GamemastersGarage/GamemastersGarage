@@ -240,22 +240,24 @@
         large: "GG_HoH_BookCover_V12.webp",
         shortDesc: "Handbook of Hauntings",
         longDesc: "A spine-chilling collection of supernatural encounters and haunted locations for your tabletop RPGs. Perfect for ghost-centric campaigns or dropping creepy moments into any setting.",
+        published: true
         links: [
           { text: "DriveThruRPG", href: "https://www.drivethrurpg.com" },
           { text: "itch.io", href: "https://itch.io" }
         ]
-      }<!--,
+      },
       {
         name: "Handbook of Hauntings (Alt)",
         thumb: "GG_HandbookOfHaunting_Thumbnail_01.jpg",
         large: "GG_HandbookOfHaunting_Thumbnail_01.jpg",
         shortDesc: "Handbook of Hauntings (Alt)",
         longDesc: "A second haunting edition with even more cursed content. Bonus material includes spectral NPCs, haunted locales, and chilling dice mechanics.",
+        published: false
         links: [
           { text: "DriveThruRPG", href: "https://www.drivethrurpg.com" },
           { text: "itch.io", href: "https://itch.io" }
         ]
-      } --!>
+      }
     ];
 
     const grid = document.getElementById("productGrid");
@@ -266,6 +268,7 @@
     let currentIndex = 0;
 
     function renderProducts() {
+      const visibleProducts = products.filter(p => p.published !== false);
       products.forEach((product, index) => {
         const div = document.createElement("div");
         div.className = "product";
