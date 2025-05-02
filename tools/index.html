@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>RPG Table Generators</title>
+    <title>Text-Based Generators</title>
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -10,53 +10,42 @@
             background-color: #f8f1e7;
             color: #1a1a1a;
             margin: 20px;
-            line-height: 1.6;
         }
-
         .generator-block {
             margin-bottom: 40px;
             padding-bottom: 30px;
             border-bottom: 1px solid #ccc;
         }
-
-        .generator-block p {
-            font-size: 1.1em;
+        .sentence {
+            font-size: 1.2em;
+            line-height: 1.6;
         }
-
         .inline-button {
             display: inline-block;
             background: none;
             border: none;
-            font-family: inherit;
-            font-weight: bold;
-            color: #1a1a1a;
+            font: inherit;
+            color: #007acc;
+            text-decoration: underline;
             cursor: pointer;
-            padding: 2px 4px;
-            margin: 0 2px;
-            text-decoration: underline dotted;
+            padding: 0 2px;
+            margin: 0;
             white-space: normal;
-            max-width: 100%;
             word-break: break-word;
         }
-
         .inline-button:hover {
-            background-color: #e0d6ca;
+            text-decoration: none;
         }
-
-        .reroll-all {
+        button.reroll-all {
             margin-top: 10px;
-            padding: 5px 10px;
-            cursor: pointer;
             font-family: 'League Spartan', sans-serif;
-            background-color: #ddd0c3;
-            border: 1px solid #aaa;
+            padding: 6px 12px;
+            cursor: pointer;
         }
-
         a {
             color: #1a1a1a;
             text-decoration: underline;
         }
-
         a:hover {
             text-decoration: none;
         }
@@ -64,152 +53,132 @@
 </head>
 <body>
 
-    <h1>RPG Table Generators</h1>
-    <div id="generators"></div>
+<h1>Random Table Generators</h1>
+<div id="generators"></div>
 
-    <script>
-        const configs = [
-            {
-                title: "NPC Generator",
-                description: "This is the NPC generator from *Quick NPCs Vol. 1*, available here:",
-                csv: "npc.csv",
-                links: {
-                    etsy: "https://www.etsy.com/yourbook",
-                    dtrpg: "https://www.drivethrurpg.com/yourbook",
-                    itch: "https://yourname.itch.io/yourbook"
-                },
-                format: ([name, hair, skin]) => {
-                    return [
-                        btn(name, 'Name'), " has ",
-                        btn(hair, 'Hair'), " hair and ",
-                        btn(skin, 'Skin'), " skin."
-                    ];
-                }
-            },
-            {
-                title: "Chase Generator",
-                description: "This is the Chase generator from *Tables of Tension*, available here:",
-                csv: "chase.csv",
-                links: {
-                    etsy: "https://www.etsy.com/chasebook",
-                    dtrpg: "https://www.drivethrurpg.com/chasebook",
-                    itch: "https://yourname.itch.io/chasebook"
-                },
-                format: ([obstacle, complication]) => {
-                    return [
-                        "During the chase, the runners face ",
-                        btn(obstacle, 'Obstacle'), " and ",
-                        btn(complication, 'Complication'), "."
-                    ];
-                }
-            },
-            {
-                title: "Haunted House Generator",
-                description: "This is the Haunted House generator from *Handbook of Hauntings*, available here:",
-                csv: "haunted.csv",
-                links: {
-                    etsy: "https://www.etsy.com/hauntbook",
-                    dtrpg: "https://www.drivethrurpg.com/hauntbook",
-                    itch: "https://yourname.itch.io/hauntbook"
-                },
-                format: ([room, phenomenon, secret]) => {
-                    return [
-                        "In the ", btn(room, 'Room'), ", there's ",
-                        btn(phenomenon, 'Phenomenon'), " hiding ",
-                        btn(secret, 'Secret'), "."
-                    ];
+<script>
+    const configs = [
+        {
+            title: "NPC Generator",
+            description: "This is the NPC generator from *Quick NPCs Vol. 1*, available here:",
+            csv: "npc.csv",
+            template: (fields, ids) => 
+                `<button class="inline-button" data-field="${ids[0]}"></button> has <button class="inline-button" data-field="${ids[1]}"></button> hair and <button class="inline-button" data-field="${ids[2]}"></button> skin.`,
+            links: {
+                etsy: "https://www.etsy.com/yourbook",
+                dtrpg: "https://www.drivethrurpg.com/yourbook",
+                itch: "https://yourname.itch.io/yourbook"
+            }
+        },
+        {
+            title: "Haunted House Generator",
+            description: "This is the Haunted House generator from *Handbook of Hauntings*, available here:",
+            csv: "haunted.csv",
+            template: (fields, ids) => 
+                `The house has <button class="inline-button" data-field="${ids[0]}"></button> and a <button class="inline-button" data-field="${ids[1]}"></button>, inhabited by <button class="inline-button" data-field="${ids[2]}"></button>.`,
+            links: {
+                etsy: "https://www.etsy.com/hauntbook",
+                dtrpg: "https://www.drivethrurpg.com/hauntbook",
+                itch: "https://yourname.itch.io/hauntbook"
+            }
+        }
+    ];
+
+    function parseCSV(text) {
+        const rows = [];
+        const lines = text.trim().split('\n');
+        for (let line of lines) {
+            const row = [];
+            let val = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                if (char === '"') {
+                    if (inQuotes && line[i + 1] === '"') {
+                        val += '"'; i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    row.push(val.trim()); val = '';
+                } else {
+                    val += char;
                 }
             }
-        ];
-
-        function btn(text, key) {
-            const span = document.createElement('button');
-            span.className = 'inline-button';
-            span.dataset.key = key;
-            span.textContent = text || '[?]';
-            return span;
+            row.push(val.trim());
+            rows.push(row);
         }
+        return rows;
+    }
 
-        function getRandomValue(arr) {
-            if (!arr || arr.length === 0) return '[Empty]';
-            return arr[Math.floor(Math.random() * arr.length)];
-        }
+    function getRandom(arr) {
+        return arr.length > 0 ? arr[Math.floor(Math.random() * arr.length)] : '[No entry]';
+    }
 
-        function parseCSV(text) {
-            const lines = text.trim().split('\n');
-            const headers = lines[0].split(',');
-            const records = lines.slice(1).map(line => line.split(','));
-            const data = {};
-
-            headers.forEach((header, i) => {
-                data[header] = [];
-                records.forEach(row => {
-                    if (row[i] && row[i].trim() !== '') {
-                        data[header].push(row[i].trim());
-                    }
+    function createGenerator(config, containerId) {
+        fetch(config.csv)
+            .then(res => res.text())
+            .then(text => {
+                const parsed = parseCSV(text);
+                const headers = parsed[0];
+                const records = parsed.slice(1);
+                const data = {};
+                headers.forEach((h, i) => {
+                    data[h] = [];
+                    records.forEach(row => {
+                        if (row[i] && row[i].trim() !== '') {
+                            data[h].push(row[i].trim());
+                        }
+                    });
                 });
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'generator-block';
+
+                const title = document.createElement('h2');
+                title.textContent = config.title;
+                wrapper.appendChild(title);
+
+                const desc = document.createElement('p');
+                desc.innerHTML = `${config.description} 
+                    <a href="${config.links.etsy}" target="_blank">Etsy</a>, 
+                    <a href="${config.links.dtrpg}" target="_blank">DriveThruRPG</a>, 
+                    <a href="${config.links.itch}" target="_blank">Itch.io</a>`;
+                wrapper.appendChild(desc);
+
+                const sentencePara = document.createElement('p');
+                sentencePara.className = 'sentence';
+                const fieldIds = headers.map((h, i) => `${containerId}-${i}`);
+                sentencePara.innerHTML = config.template(headers, fieldIds);
+                wrapper.appendChild(sentencePara);
+
+                headers.forEach((header, i) => {
+                    const fieldId = fieldIds[i];
+                    const btn = sentencePara.querySelector(`[data-field="${fieldId}"]`);
+                    const reroll = () => {
+                        btn.textContent = getRandom(data[header]);
+                    };
+                    btn.addEventListener('click', reroll);
+                    reroll(); // Initial roll
+                });
+
+                const rerollAll = document.createElement('button');
+                rerollAll.className = 'reroll-all';
+                rerollAll.textContent = 'Reroll All';
+                rerollAll.onclick = () => {
+                    headers.forEach((header, i) => {
+                        const fieldId = fieldIds[i];
+                        const btn = sentencePara.querySelector(`[data-field="${fieldId}"]`);
+                        btn.textContent = getRandom(data[header]);
+                    });
+                };
+                wrapper.appendChild(rerollAll);
+
+                document.getElementById('generators').appendChild(wrapper);
             });
+    }
 
-            return { headers, data };
-        }
-
-        function createGenerator(config, id) {
-            fetch(config.csv)
-                .then(res => res.text())
-                .then(text => {
-                    const { headers, data } = parseCSV(text);
-
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'generator-block';
-
-                    const title = document.createElement('h2');
-                    title.textContent = config.title;
-                    wrapper.appendChild(title);
-
-                    const desc = document.createElement('p');
-                    desc.innerHTML = `${config.description} 
-                        <a href="${config.links.etsy}" target="_blank">Etsy</a>, 
-                        <a href="${config.links.dtrpg}" target="_blank">DriveThruRPG</a>, 
-                        <a href="${config.links.itch}" target="_blank">Itch.io</a>`;
-                    wrapper.appendChild(desc);
-
-                    const sentencePara = document.createElement('p');
-                    sentencePara.id = `sentence-${id}`;
-                    wrapper.appendChild(sentencePara);
-
-                    const rerollAllBtn = document.createElement('button');
-                    rerollAllBtn.className = 'reroll-all';
-                    rerollAllBtn.textContent = 'Reroll All';
-                    wrapper.appendChild(rerollAllBtn);
-
-                    document.getElementById('generators').appendChild(wrapper);
-
-                    const rerollOne = (btnEl, key) => {
-                        const val = getRandomValue(data[key]);
-                        btnEl.textContent = val;
-                    };
-
-                    const rerollAll = () => {
-                        const args = headers.map(h => getRandomValue(data[h]));
-                        const sentenceParts = config.format(args);
-
-                        sentencePara.innerHTML = '';
-                        sentenceParts.forEach(part => {
-                            if (typeof part === 'string') {
-                                sentencePara.appendChild(document.createTextNode(part));
-                            } else if (part instanceof HTMLElement && part.dataset.key) {
-                                part.onclick = () => rerollOne(part, part.dataset.key);
-                                sentencePara.appendChild(part);
-                            }
-                        });
-                    };
-
-                    rerollAllBtn.onclick = rerollAll;
-                    rerollAll(); // Initial roll
-                });
-        }
-
-        configs.forEach((config, i) => createGenerator(config, `gen${i}`));
-    </script>
+    configs.forEach((cfg, idx) => createGenerator(cfg, `gen${idx}`));
+</script>
 </body>
 </html>
