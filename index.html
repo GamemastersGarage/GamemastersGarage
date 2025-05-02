@@ -16,8 +16,61 @@
       text-align: center;
     }
 
+    /* Burger Menu Styles */
+    .menu-toggle {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      width: 30px;
+      height: 25px;
+      cursor: pointer;
+      z-index: 2000;
+    }
+
+    .menu-toggle span {
+      display: block;
+      height: 4px;
+      background: #000;
+      margin: 5px 0;
+      transition: 0.3s;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: #fbf6ef;
+      width: 200px;
+      height: 100vh;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+      z-index: 1500;
+      padding-top: 60px;
+      text-align: left;
+    }
+
+    nav.active {
+      transform: translateX(0);
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0 20px;
+    }
+
+    nav li {
+      margin: 20px 0;
+    }
+
+    nav a {
+      color: #000;
+      text-decoration: none;
+      font-size: 18px;
+    }
+
     header {
-      padding: 40px 20px;
+      padding: 60px 20px 40px; /* Adjusted for burger space */
     }
 
     header img {
@@ -94,20 +147,19 @@
       overflow-y: auto;
     }
 
-.close-button {
-  color: #000;
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-  z-index: 9999; /* Ensure it's above arrows */
-  background-color: #f8f0e3; /* Optional: for better tap targeting on mobile */
-  padding: 4px 10px;
-  border-radius: 4px;
-}
-
+    .close-button {
+      color: #000;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 9999;
+      background-color: #f8f0e3;
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
 
     .product-grid {
       display: flex;
@@ -191,48 +243,70 @@
   </style>
 </head>
 <body>
-  <header>
-    <picture>
-      <source srcset="GamemastersGarage_Logo_WEBP_512x.webp" type="image/webp">
-      <img src="GamemastersGarage_Logo_PNG_512x.png" alt="Gamemaster's Garage Logo" width="150" />
-    </picture>
-    <h1>Makers of quality TTRPG tools</h1>
 
-    <div class="signup">
-      <button id="openForm" class="form-button">Join Our Mailing List</button>
-      <p class="contact-email">or reach out: <a href="mailto:info@gamemastersgarage.com">info@gamemastersgarage.com</a></p>
+<!-- Burger Toggle -->
+<div class="menu-toggle" onclick="toggleMenu()">
+  <span></span>
+  <span></span>
+  <span></span>
+</div>
+
+<!-- Navigation Menu -->
+<nav id="mainMenu">
+  <ul>
+    <li><a href="#">Home</a></li>
+    <li><a href="#productGrid">Products</a></li>
+    <li><a href="mailto:info@gamemastersgarage.com">Contact</a></li>
+  </ul>
+</nav>
+
+<header>
+  <picture>
+    <source srcset="GamemastersGarage_Logo_WEBP_512x.webp" type="image/webp">
+    <img src="GamemastersGarage_Logo_PNG_512x.png" alt="Gamemaster's Garage Logo" width="150" />
+  </picture>
+  <h1>Makers of quality TTRPG tools</h1>
+
+  <div class="signup">
+    <button id="openForm" class="form-button">Join Our Mailing List</button>
+    <p class="contact-email">or reach out: <a href="mailto:info@gamemastersgarage.com">info@gamemastersgarage.com</a></p>
+  </div>
+
+  <!-- Mailing List Modal -->
+  <div id="formModal" class="modal">
+    <div class="modal-content">
+      <span class="close-button">&times;</span>
+      <iframe 
+        src="https://docs.google.com/forms/d/e/1FAIpQLSdd-jowcMCdLik7Jeb4FmZV7jLdJdemap4uP8gImlh6kBYX6A/viewform?usp=header" 
+        frameborder="0" 
+        style="width:100%; height:500px; border:none;">
+        Loading…
+      </iframe>
     </div>
+  </div>
 
-    <!-- Mailing List Modal -->
-    <div id="formModal" class="modal">
-      <div class="modal-content">
-        <span class="close-button">&times;</span>
-        <iframe 
-          src="https://docs.google.com/forms/d/e/1FAIpQLSdd-jowcMCdLik7Jeb4FmZV7jLdJdemap4uP8gImlh6kBYX6A/viewform?usp=header" 
-          frameborder="0" 
-          style="width:100%; height:500px; border:none;">
-          Loading…
-        </iframe>
-      </div>
+  <!-- Gallery Modal -->
+  <div id="galleryModal" class="gallery-modal">
+    <div class="gallery-content">
+      <span class="close-button" id="closeGallery">&times;</span>
+      <div class="gallery-nav left-arrow" id="prevProduct">&#10094;</div>
+      <div class="gallery-nav right-arrow" id="nextProduct">&#10095;</div>
+      <img id="galleryImage" class="gallery-image" src="" alt="" />
+      <div class="gallery-description" id="galleryDescription"></div>
     </div>
+  </div>
+</header>
 
-    <!-- Gallery Modal -->
-    <div id="galleryModal" class="gallery-modal">
-      <div class="gallery-content">
-        <span class="close-button" id="closeGallery">&times;</span>
-        <div class="gallery-nav left-arrow" id="prevProduct">&#10094;</div>
-        <div class="gallery-nav right-arrow" id="nextProduct">&#10095;</div>
-        <img id="galleryImage" class="gallery-image" src="" alt="" />
-        <div class="gallery-description" id="galleryDescription"></div>
-      </div>
-    </div>
-  </header>
-
-  <section class="product-grid" id="productGrid">
-    <!-- Products will be injected here -->
-  </section>
+<section class="product-grid" id="productGrid">
+  <!-- Products will be injected here -->
+</section>
 
 <script>
+  function toggleMenu() {
+    const menu = document.getElementById("mainMenu");
+    menu.classList.toggle("active");
+  }
+
   const allProducts = [
     {
       name: "Handbook of Hauntings",
@@ -260,14 +334,11 @@
     }
   ];
 
-  // Filter only enabled products
   const products = allProducts.filter(p => p.enabled);
-
   const grid = document.getElementById("productGrid");
   const galleryModal = document.getElementById("galleryModal");
   const galleryImage = document.getElementById("galleryImage");
   const galleryDescription = document.getElementById("galleryDescription");
-
   let currentIndex = 0;
 
   function renderProducts() {
@@ -341,7 +412,6 @@
     if (e.target === galleryModal) closeGallery();
   });
 
-  // Mailing List Modal
   const formModal = document.getElementById("formModal");
   const formBtn = document.getElementById("openForm");
   const formCloseBtn = document.querySelector(".modal .close-button");
