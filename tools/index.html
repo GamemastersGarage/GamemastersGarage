@@ -111,9 +111,18 @@
         return rows;
     }
 
-    function getRandom(arr) {
-        return arr.length > 0 ? arr[Math.floor(Math.random() * arr.length)] : '[No entry]';
-    }
+  function getRandom(arr, exclude = null) {
+    if (!arr || arr.length === 0) return '[No entry]';
+    if (arr.length === 1) return arr[0]; // can't avoid a repeat
+    let candidate;
+    let attempts = 0;
+    do {
+        candidate = arr[Math.floor(Math.random() * arr.length)];
+        attempts++;
+    } while (candidate === exclude && attempts < 10);
+    return candidate;
+}
+
 
     function createGenerator(config, containerId) {
         fetch(config.csv)
