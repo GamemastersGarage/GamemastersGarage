@@ -132,13 +132,17 @@
                 const headers = parsed[0];
                 const records = parsed.slice(1);
                 const data = {};
-                headers.forEach((h, i) => {
-                    data[h] = [];
-                    records.forEach(row => {
-                        if (row[i] && row[i].trim() !== '') {
-                            data[h].push(row[i].trim());
-                        }
-                    });
+headers.forEach((header, i) => {
+    const fieldId = fieldIds[i];
+    const btn = sentencePara.querySelector(`[data-field="${fieldId}"]`);
+    const reroll = () => {
+        const current = btn.textContent;
+        btn.textContent = getRandom(data[header], current);
+    };
+    btn.addEventListener('click', reroll);
+    reroll(); // Initial roll
+});
+
                 });
 
                 const wrapper = document.createElement('div');
