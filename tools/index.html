@@ -84,6 +84,7 @@
         }
     ];
 
+    // Proper CSV parser to handle quotes and commas
     function parseCSV(text) {
         const rows = [];
         const lines = text.trim().split('\n');
@@ -95,12 +96,14 @@
                 const char = line[i];
                 if (char === '"') {
                     if (inQuotes && line[i + 1] === '"') {
-                        val += '"'; i++;
+                        val += '"';
+                        i++;
                     } else {
                         inQuotes = !inQuotes;
                     }
                 } else if (char === ',' && !inQuotes) {
-                    row.push(val.trim()); val = '';
+                    row.push(val.trim());
+                    val = '';
                 } else {
                     val += char;
                 }
@@ -111,18 +114,14 @@
         return rows;
     }
 
-  function getRandom(arr, exclude = null) {
-    if (!arr || arr.length === 0) return '[No entry]';
-    if (arr.length === 1) return arr[0]; // can't avoid a repeat
-    let candidate;
-    let attempts = 0;
-    do {
-        candidate = arr[Math.floor(Math.random() * arr.length)];
-        attempts++;
-    } while (candidate === exclude && attempts < 10);
-    return candidate;
-}
-
+    function getNewRandom(arr, current) {
+        if (arr.length <= 1) return arr[0] || '[No entry]';
+        let newVal;
+        do {
+            newVal = arr[Math.floor(Math.random() * arr.length)];
+        } while (newVal === current);
+        return newVal;
+    }
 
     function createGenerator(config, containerId) {
         fetch(config.csv)
@@ -132,17 +131,14 @@
                 const headers = parsed[0];
                 const records = parsed.slice(1);
                 const data = {};
-headers.forEach((header, i) => {
-    const fieldId = fieldIds[i];
-    const btn = sentencePara.querySelector(`[data-field="${fieldId}"]`);
-    const reroll = () => {
-        const current = btn.textContent;
-        btn.textContent = getRandom(data[header], current);
-    };
-    btn.addEventListener('click', reroll);
-    reroll(); // Initial roll
-});
 
+                headers.forEach((header, i) => {
+                    data[header] = [];
+                    records.forEach(row => {
+                        if (row[i] && row[i].trim() !== '') {
+                            data[header].push(row[i].trim());
+                        }
+                    });
                 });
 
                 const wrapper = document.createElement('div');
@@ -161,7 +157,7 @@ headers.forEach((header, i) => {
 
                 const sentencePara = document.createElement('p');
                 sentencePara.className = 'sentence';
-                const fieldIds = headers.map((h, i) => `${containerId}-${i}`);
+                const fieldIds = headers.map((_, i) => `${containerId}-${i}`);
                 sentencePara.innerHTML = config.template(headers, fieldIds);
                 wrapper.appendChild(sentencePara);
 
@@ -169,7 +165,8 @@ headers.forEach((header, i) => {
                     const fieldId = fieldIds[i];
                     const btn = sentencePara.querySelector(`[data-field="${fieldId}"]`);
                     const reroll = () => {
-                        btn.textContent = getRandom(data[header]);
+                        const newVal = getNewRandom(data[header], btn.textContent);
+                        btn.textContent = newVal;
                     };
                     btn.addEventListener('click', reroll);
                     reroll(); // Initial roll
@@ -182,7 +179,7 @@ headers.forEach((header, i) => {
                     headers.forEach((header, i) => {
                         const fieldId = fieldIds[i];
                         const btn = sentencePara.querySelector(`[data-field="${fieldId}"]`);
-                        btn.textContent = getRandom(data[header]);
+                        btn.textContent = getNewRandom(data[header], btn.textContent);
                     });
                 };
                 wrapper.appendChild(rerollAll);
