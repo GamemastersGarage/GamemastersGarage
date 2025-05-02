@@ -232,120 +232,127 @@
     <!-- Products will be injected here -->
   </section>
 
-  <script>
-    const products = [
-      {
-        name: "Handbook of Hauntings",
-        thumb: "GG_HoH_BookCover_V12.webp",
-        large: "GG_HoH_BookCover_V12.webp",
-        shortDesc: "Handbook of Hauntings",
-        longDesc: "A spine-chilling collection of supernatural encounters and haunted locations for your tabletop RPGs. Perfect for ghost-centric campaigns or dropping creepy moments into any setting.",
-        links: [
-          { text: "DriveThruRPG", href: "https://www.drivethrurpg.com" },
-          { text: "itch.io", href: "https://itch.io" }
-        ]
-      },
-      {
-        name: "Handbook of Hauntings (Alt)",
-        thumb: "GG_HandbookOfHaunting_Thumbnail_01.jpg",
-        large: "GG_HandbookOfHaunting_Thumbnail_01.jpg",
-        shortDesc: "Handbook of Hauntings (Alt)",
-        longDesc: "A second haunting edition with even more cursed content. Bonus material includes spectral NPCs, haunted locales, and chilling dice mechanics.",
-        links: [
-          { text: "DriveThruRPG", href: "https://www.drivethrurpg.com" },
-          { text: "itch.io", href: "https://itch.io" }
-        ]
-      }
-    ];
-
-    const grid = document.getElementById("productGrid");
-    const galleryModal = document.getElementById("galleryModal");
-    const galleryImage = document.getElementById("galleryImage");
-    const galleryDescription = document.getElementById("galleryDescription");
-
-    let currentIndex = 0;
-
-    function renderProducts() {
-      products.forEach((product, index) => {
-        const div = document.createElement("div");
-        div.className = "product";
-        div.innerHTML = `
-          <img src="${product.thumb}" alt="${product.name}">
-          <h3>${product.shortDesc}</h3>
-          <div class="links">
-            ${product.links.map(link => `<a href="${link.href}" target="_blank">${link.text}</a>`).join('')}
-          </div>
-        `;
-        div.addEventListener("click", () => openGallery(index));
-        grid.appendChild(div);
-      });
+<script>
+  const allProducts = [
+    {
+      name: "Handbook of Hauntings",
+      thumb: "GG_HoH_BookCover_V12.webp",
+      large: "GG_HoH_BookCover_V12.webp",
+      shortDesc: "Handbook of Hauntings",
+      longDesc: "A spine-chilling collection of supernatural encounters and haunted locations for your tabletop RPGs. Perfect for ghost-centric campaigns or dropping creepy moments into any setting.",
+      links: [
+        { text: "DriveThruRPG", href: "https://www.drivethrurpg.com" },
+        { text: "itch.io", href: "https://itch.io" }
+      ],
+      enabled: true
+    },
+    {
+      name: "Handbook of Hauntings (Alt)",
+      thumb: "GG_HandbookOfHaunting_Thumbnail_01.jpg",
+      large: "GG_HandbookOfHaunting_Thumbnail_01.jpg",
+      shortDesc: "Handbook of Hauntings (Alt)",
+      longDesc: "A second haunting edition with even more cursed content. Bonus material includes spectral NPCs, haunted locales, and chilling dice mechanics.",
+      links: [
+        { text: "DriveThruRPG", href: "https://www.drivethrurpg.com" },
+        { text: "itch.io", href: "https://itch.io" }
+      ],
+      enabled: false
     }
+  ];
 
-    function openGallery(index) {
-      currentIndex = index;
-      const product = products[index];
-      galleryImage.src = product.large;
-      galleryImage.alt = product.name;
-      galleryDescription.innerHTML = `
-        <h2>${product.name}</h2>
-        <p>${product.longDesc}</p>
+  // Filter only enabled products
+  const products = allProducts.filter(p => p.enabled);
+
+  const grid = document.getElementById("productGrid");
+  const galleryModal = document.getElementById("galleryModal");
+  const galleryImage = document.getElementById("galleryImage");
+  const galleryDescription = document.getElementById("galleryDescription");
+
+  let currentIndex = 0;
+
+  function renderProducts() {
+    products.forEach((product, index) => {
+      const div = document.createElement("div");
+      div.className = "product";
+      div.innerHTML = `
+        <img src="${product.thumb}" alt="${product.name}">
+        <h3>${product.shortDesc}</h3>
         <div class="links">
           ${product.links.map(link => `<a href="${link.href}" target="_blank">${link.text}</a>`).join('')}
         </div>
       `;
-      galleryModal.classList.add("active");
-    }
-
-    function closeGallery() {
-      galleryModal.classList.remove("active");
-    }
-
-    function showPrevProduct() {
-      currentIndex = (currentIndex - 1 + products.length) % products.length;
-      openGallery(currentIndex);
-    }
-
-    function showNextProduct() {
-      currentIndex = (currentIndex + 1) % products.length;
-      openGallery(currentIndex);
-    }
-
-    document.getElementById("prevProduct").addEventListener("click", (e) => {
-      e.stopPropagation();
-      showPrevProduct();
+      div.addEventListener("click", () => openGallery(index));
+      grid.appendChild(div);
     });
+  }
 
-    document.getElementById("nextProduct").addEventListener("click", (e) => {
-      e.stopPropagation();
-      showNextProduct();
-    });
+  function openGallery(index) {
+    currentIndex = index;
+    const product = products[currentIndex];
+    galleryImage.src = product.large;
+    galleryImage.alt = product.name;
+    galleryDescription.innerHTML = `
+      <h2>${product.name}</h2>
+      <p>${product.longDesc}</p>
+      <div class="links">
+        ${product.links.map(link => `<a href="${link.href}" target="_blank">${link.text}</a>`).join('')}
+      </div>
+    `;
+    galleryModal.classList.add("active");
+  }
 
-    document.getElementById("closeGallery").addEventListener("click", closeGallery);
+  function closeGallery() {
+    galleryModal.classList.remove("active");
+  }
 
-    window.addEventListener("keydown", (e) => {
-      if (galleryModal.classList.contains("active")) {
-        if (e.key === "ArrowLeft") showPrevProduct();
-        if (e.key === "ArrowRight") showNextProduct();
-        if (e.key === "Escape") closeGallery();
-      }
-    });
+  function showPrevProduct() {
+    if (products.length === 0) return;
+    currentIndex = (currentIndex - 1 + products.length) % products.length;
+    openGallery(currentIndex);
+  }
 
-    galleryModal.addEventListener("click", (e) => {
-      if (e.target === galleryModal) closeGallery();
-    });
+  function showNextProduct() {
+    if (products.length === 0) return;
+    currentIndex = (currentIndex + 1) % products.length;
+    openGallery(currentIndex);
+  }
 
-    // Mailing List Modal
-    const formModal = document.getElementById("formModal");
-    const formBtn = document.getElementById("openForm");
-    const formCloseBtn = document.querySelector(".modal .close-button");
+  document.getElementById("prevProduct").addEventListener("click", (e) => {
+    e.stopPropagation();
+    showPrevProduct();
+  });
 
-    formBtn.onclick = () => formModal.style.display = "block";
-    formCloseBtn.onclick = () => formModal.style.display = "none";
-    window.onclick = (event) => {
-      if (event.target === formModal) formModal.style.display = "none";
-    };
+  document.getElementById("nextProduct").addEventListener("click", (e) => {
+    e.stopPropagation();
+    showNextProduct();
+  });
 
-    renderProducts();
-  </script>
+  document.getElementById("closeGallery").addEventListener("click", closeGallery);
+
+  window.addEventListener("keydown", (e) => {
+    if (galleryModal.classList.contains("active")) {
+      if (e.key === "ArrowLeft") showPrevProduct();
+      if (e.key === "ArrowRight") showNextProduct();
+      if (e.key === "Escape") closeGallery();
+    }
+  });
+
+  galleryModal.addEventListener("click", (e) => {
+    if (e.target === galleryModal) closeGallery();
+  });
+
+  // Mailing List Modal
+  const formModal = document.getElementById("formModal");
+  const formBtn = document.getElementById("openForm");
+  const formCloseBtn = document.querySelector(".modal .close-button");
+
+  formBtn.onclick = () => formModal.style.display = "block";
+  formCloseBtn.onclick = () => formModal.style.display = "none";
+  window.onclick = (event) => {
+    if (event.target === formModal) formModal.style.display = "none";
+  };
+
+  renderProducts();
+</script>
 </body>
 </html>
