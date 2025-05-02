@@ -16,19 +16,37 @@
             padding-bottom: 20px;
             border-bottom: 1px solid #ccc;
         }
+        .generator-header h2 {
+            margin-bottom: 5px;
+        }
+        .generator-header p {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
         .section {
+            display: flex;
+            align-items: center;
             margin: 10px 0;
         }
+        .label {
+            width: 160px;
+            font-weight: bold;
+        }
+        .output {
+            min-width: 250px;
+            display: inline-block;
+            padding: 4px 6px;
+            background: #fff;
+            border: 1px solid #aaa;
+            margin-right: 10px;
+        }
         button {
-            margin-left: 10px;
             font-family: 'League Spartan', sans-serif;
             padding: 5px 10px;
             cursor: pointer;
         }
-        .output {
-            display: inline-block;
-            width: 150px;
-            font-weight: bold;
+        .reroll-all-btn {
+            margin-top: 10px;
         }
         a {
             color: #1a1a1a;
@@ -79,7 +97,10 @@
         ];
 
         function getRandomValue(arr) {
-            return arr[Math.floor(Math.random() * arr.length)];
+            if (!Array.isArray(arr) || arr.length === 0) return '';
+            const filtered = arr.filter(item => item && item.trim() !== '');
+            if (filtered.length === 0) return '';
+            return filtered[Math.floor(Math.random() * filtered.length)];
         }
 
         function createGenerator(config, containerId) {
@@ -87,59 +108,71 @@
                 .then(res => res.text())
                 .then(text => {
                     const lines = text.trim().split('\n');
-                    const headers = lines[0].split(',');
+                    const headers = lines[0].split(',').map(h => h.trim());
                     const records = lines.slice(1).map(row => row.split(','));
-                    const data = {};
 
+                    const data = {};
                     headers.forEach((header, i) => {
-                        data[header] = records.map(row => row[i]);
+                        data[header] = records
+                            .map(row => row[i] ? row[i].trim() : '')
+                            .filter(val => val !== '');
                     });
 
                     const wrapper = document.createElement('div');
                     wrapper.className = 'generator-block';
 
+                    // Header
+                    const headerDiv = document.createElement('div');
+                    headerDiv.className = 'generator-header';
+
                     const title = document.createElement('h2');
                     title.textContent = config.title;
-                    wrapper.appendChild(title);
+                    headerDiv.appendChild(title);
 
                     const desc = document.createElement('p');
                     desc.innerHTML = `${config.description} 
                         <a href="${config.links.etsy}" target="_blank">Etsy</a>, 
                         <a href="${config.links.dtrpg}" target="_blank">DriveThruRPG</a>, 
                         <a href="${config.links.itch}" target="_blank">Itch.io</a>`;
-                    wrapper.appendChild(desc);
+                    headerDiv.appendChild(desc);
+                    wrapper.appendChild(headerDiv);
 
+                    // Generator UI
                     const genDiv = document.createElement('div');
                     headers.forEach(header => {
-                        const div = document.createElement('div');
-                        div.className = 'section';
+                        const section = document.createElement('div');
+                        section.className = 'section';
 
                         const label = document.createElement('span');
+                        label.className = 'label';
                         label.textContent = `${header}: `;
-                        div.appendChild(label);
+                        section.appendChild(label);
 
                         const output = document.createElement('span');
                         output.className = 'output';
                         output.id = `${containerId}-${header}`;
-                        div.appendChild(output);
+                        output.textContent = '...';
+                        section.appendChild(output);
 
                         const button = document.createElement('button');
                         button.textContent = 'Reroll';
                         button.onclick = () => {
                             const val = getRandomValue(data[header]);
-                            output.textContent = val;
+                            output.textContent = val || '[No Data]';
                         };
-                        div.appendChild(button);
+                        section.appendChild(button);
 
-                        genDiv.appendChild(div);
+                        genDiv.appendChild(section);
                     });
 
                     const rerollAllBtn = document.createElement('button');
+                    rerollAllBtn.className = 'reroll-all-btn';
                     rerollAllBtn.textContent = 'Reroll All';
                     rerollAllBtn.onclick = () => {
                         headers.forEach(header => {
                             const val = getRandomValue(data[header]);
-                            document.getElementById(`${containerId}-${header}`).textContent = val;
+                            const outputEl = document.getElementById(`${containerId}-${header}`);
+                            if (outputEl) outputEl.textContent = val || '[No Data]';
                         });
                     };
                     genDiv.appendChild(rerollAllBtn);
@@ -147,8 +180,7 @@
                     wrapper.appendChild(genDiv);
                     document.getElementById('generators').appendChild(wrapper);
 
-                    // Initial roll
-                    rerollAllBtn.click();
+                    rerollAllBtn.click(); // Initial roll
                 });
         }
 
