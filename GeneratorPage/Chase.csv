@@ -1,0 +1,7 @@
+Obstacle,Path,Alternate path
+The surface you're travelling on is in poor condition,Ladder upwards,Ladder upwards
+The surface you're travelling on is slippy,Sharp left turn,Sharp left turn
+A stack of objects is teetering nearby,Narrow passage,Narrow passage
+The weather is getting worse,Wide open area,Wide open area
+,Sharp right turn,Sharp right turn
+,Subterranean opening,Subterranean opening
