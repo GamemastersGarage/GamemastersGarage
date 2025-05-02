@@ -178,7 +178,7 @@ const raceScales = {
 // Just the names — no need to manage file paths manually
 const races = ["orc", "human", "elf", "dwarf", "demon", "halfling", "ogre", "bug"];
 const armours = ["steel", "loin-cloth", "robe"];
-const weapons = ["longsword", "axe", "hammer"];
+const weapon = ["longsword", "axe", "hammer"];
 
 function addMiniatureInput() {
   const div = document.createElement('div');
@@ -186,7 +186,7 @@ function addMiniatureInput() {
   div.innerHTML = `
     Race: <select class="race">${races.map(r => `<option value="${r}">${r}</option>`).join('')}</select>
     Armour: <select class="armour">${armours.map(a => `<option value="${a}">${a}</option>`).join('')}</select>
-    Weapon: <select class="weapon">${weapons.map(w => `<option value="${w}">${w}</option>`).join('')}</select>
+    Weapon: <select class="weapon">${weapon.map(w => `<option value="${w}">${w}</option>`).join('')}</select>
     Quantity: <input type="number" class="quantity" value="1" min="1">
     <button onclick="this.parentNode.remove()">❌ Delete</button>
   `;
@@ -247,7 +247,7 @@ async function generate() {
 
     const headImg = await loadImage(`images/head/head_${miniature.race}.png`);
     const armourImg = await loadImage(`images/armour/armour_${miniature.armour}.png`);
-    const weaponImg = await loadImage(`images/weapons/weapon_${miniature.weapon}.png`);
+    const weaponImg = await loadImage(`images/weapon/weapon_${miniature.weapon}.png`);
 
     if (armourImg) tempCtx.drawImage(armourImg, 0, 0, w, h);
     if (headImg) tempCtx.drawImage(headImg, 0, 0, w, h);
