@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -13,8 +15,61 @@
       padding: 0;
     }
 
+    /* Burger Menu Styles */
+    .menu-toggle {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      width: 30px;
+      height: 25px;
+      cursor: pointer;
+      z-index: 2000;
+    }
+
+    .menu-toggle span {
+      display: block;
+      height: 4px;
+      background: #000;
+      margin: 5px 0;
+      transition: 0.3s;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: #fbf6ef;
+      width: 200px;
+      height: 100vh;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+      z-index: 1500;
+      padding-top: 60px;
+      text-align: left;
+    }
+
+    nav.active {
+      transform: translateX(0);
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0 20px;
+    }
+
+    nav li {
+      margin: 20px 0;
+    }
+
+    nav a {
+      color: #000;
+      text-decoration: none;
+      font-size: 18px;
+    }
+
     header {
-      padding: 40px 20px;
+      padding: 60px 20px 40px;
       text-align: center;
     }
 
@@ -92,195 +147,203 @@
   </style>
 </head>
 <body>
-<body>
 
-</head>
-<body>
-  <header>
-    <picture>
-      <source srcset="GamemastersGarage_Logo_WEBP_512x.webp" type="image/webp">
-      <img src="GamemastersGarage_Logo_PNG_512x.png" alt="Gamemaster's Garage Logo" width="150" />
-    </picture>
-      <!-- Mailing List Modal -->
-  <div id="formModal" class="modal">
-    <div class="modal-content">
-      <span class="close-button">&times;</span>
-      <iframe 
-        src="https://docs.google.com/forms/d/e/1FAIpQLSdd-jowcMCdLik7Jeb4FmZV7jLdJdemap4uP8gImlh6kBYX6A/viewform?usp=header" 
-        frameborder="0" 
-        style="width:100%; height:500px; border:none;">
-        Loading…
-      </iframe>
-    </div>
-  </div>
+<!-- Burger Toggle -->
+<div class="menu-toggle" onclick="toggleMenu()">
+  <span></span>
+  <span></span>
+  <span></span>
+</div>
+
+<!-- Navigation Menu -->
+<nav id="mainMenu">
+  <ul>
+    <li><a href="/">Home</a></li>
+    <li><a href="#generators">Generators</a></li>
+    <li><a href="mailto:info@gamemastersgarage.com">Contact</a></li>
+  </ul>
+</nav>
+
+<header>
+  <picture>
+    <source srcset="GamemastersGarage_Logo_WEBP_512x.webp" type="image/webp">
+    <img src="GamemastersGarage_Logo_PNG_512x.png" alt="Gamemaster's Garage Logo" width="150" />
+  </picture>
   <h1>Random Table Generators</h1>
 
   <!-- Dropdown menu for navigation -->
   <label for="generator-select">Jump to:</label>
   <select id="generator-select">
-      <option value="">-- Select a generator --</option>
+    <option value="">-- Select a generator --</option>
   </select>
 </header>
 
 <div id="generators"></div>
 
-
 <script>
-    const configs = [
-        {
-            title: "NPC Generator",
-            description: "This is the NPC generator from *Quick NPCs Vol. 1*, available here:",
-            csv: "npc.csv",
-            template: (fields, ids) => 
-                `<button class="inline-button" data-field="${ids[0]}"></button> has <button class="inline-button" data-field="${ids[1]}"></button> hair and <button class="inline-button" data-field="${ids[2]}"></button> skin.`,
-            links: {
-                etsy: "https://www.etsy.com/yourbook",
-                dtrpg: "https://www.drivethrurpg.com/yourbook",
-                itch: "https://yourname.itch.io/yourbook"
-            }
-        },
-        {
-            title: "Haunted House Generator",
-            description: "This is the Haunted House generator from *Handbook of Hauntings*, available here:",
-            csv: "haunted.csv",
-            template: (fields, ids) => 
-                `The house has <button class="inline-button" data-field="${ids[0]}"></button> and a <button class="inline-button" data-field="${ids[1]}"></button>, inhabited by <button class="inline-button" data-field="${ids[2]}"></button>.`,
-            links: {
-                etsy: "https://www.etsy.com/hauntbook",
-                dtrpg: "https://www.drivethrurpg.com/hauntbook",
-                itch: "https://yourname.itch.io/hauntbook"
-            }
+  function toggleMenu() {
+    const menu = document.getElementById("mainMenu");
+    menu.classList.toggle("active");
+  }
+
+  const configs = [
+    {
+      title: "NPC Generator",
+      description: "This is the NPC generator from *Quick NPCs Vol. 1*, available here:",
+      csv: "npc.csv",
+      template: (fields, ids) => 
+        `<button class="inline-button" data-field="${ids[0]}"></button> has <button class="inline-button" data-field="${ids[1]}"></button> hair and <button class="inline-button" data-field="${ids[2]}"></button> skin.`,
+      links: {
+        etsy: "https://www.etsy.com/yourbook",
+        dtrpg: "https://www.drivethrurpg.com/yourbook",
+        itch: "https://yourname.itch.io/yourbook"
+      }
+    },
+    {
+      title: "Haunted House Generator",
+      description: "This is the Haunted House generator from *Handbook of Hauntings*, available here:",
+      csv: "haunted.csv",
+      template: (fields, ids) => 
+        `The house has <button class="inline-button" data-field="${ids[0]}"></button> and a <button class="inline-button" data-field="${ids[1]}"></button>, inhabited by <button class="inline-button" data-field="${ids[2]}"></button>.`,
+      links: {
+        etsy: "https://www.etsy.com/hauntbook",
+        dtrpg: "https://www.drivethrurpg.com/hauntbook",
+        itch: "https://yourname.itch.io/hauntbook"
+      }
+    }
+  ];
+
+  function parseCSV(text) {
+    const rows = [];
+    const lines = text.trim().split('\n');
+    for (let line of lines) {
+      const row = [];
+      let val = '', inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+          if (inQuotes && line[i + 1] === '"') {
+            val += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          row.push(val.trim());
+          val = '';
+        } else {
+          val += char;
         }
-    ];
-
-    function parseCSV(text) {
-        const rows = [];
-        const lines = text.trim().split('\n');
-        for (let line of lines) {
-            const row = [];
-            let val = '', inQuotes = false;
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i];
-                if (char === '"') {
-                    if (inQuotes && line[i + 1] === '"') {
-                        val += '"';
-                        i++;
-                    } else {
-                        inQuotes = !inQuotes;
-                    }
-                } else if (char === ',' && !inQuotes) {
-                    row.push(val.trim());
-                    val = '';
-                } else {
-                    val += char;
-                }
-            }
-            row.push(val.trim());
-            rows.push(row);
-        }
-        return rows;
+      }
+      row.push(val.trim());
+      rows.push(row);
     }
+    return rows;
+  }
 
-    function getNewRandom(arr, current) {
-        if (arr.length <= 1) return arr[0] || '[No entry]';
-        let newVal;
-        do {
-            newVal = arr[Math.floor(Math.random() * arr.length)];
-        } while (newVal === current);
-        return newVal;
-    }
+  function getNewRandom(arr, current) {
+    if (arr.length <= 1) return arr[0] || '[No entry]';
+    let newVal;
+    do {
+      newVal = arr[Math.floor(Math.random() * arr.length)];
+    } while (newVal === current);
+    return newVal;
+  }
 
-    function createEntry(headers, fieldIds, data, template) {
-        const wrapper = document.createElement('p');
-        wrapper.className = 'sentence';
-        wrapper.innerHTML = template(headers, fieldIds);
+  function createEntry(headers, fieldIds, data, template) {
+    const wrapper = document.createElement('p');
+    wrapper.className = 'sentence';
+    wrapper.innerHTML = template(headers, fieldIds);
 
-        headers.forEach((header, i) => {
-            const btn = wrapper.querySelector(`[data-field="${fieldIds[i]}"]`);
-            const reroll = () => {
-                btn.textContent = getNewRandom(data[header], btn.textContent);
-            };
-            btn.addEventListener('click', reroll);
-            reroll();
-        });
-
-        return wrapper;
-    }
-
-    function createGenerator(config, containerId) {
-        fetch(config.csv)
-            .then(res => res.text())
-            .then(text => {
-                const parsed = parseCSV(text);
-                const headers = parsed[0];
-                const records = parsed.slice(1);
-                const data = {};
-
-                headers.forEach((header, i) => {
-                    data[header] = [];
-                    records.forEach(row => {
-                        if (row[i] && row[i].trim() !== '') {
-                            data[header].push(row[i].trim());
-                        }
-                    });
-                });
-
-                const wrapper = document.createElement('div');
-                wrapper.className = 'generator-block';
-                wrapper.id = containerId;
-
-                const title = document.createElement('h2');
-                title.textContent = config.title;
-                wrapper.appendChild(title);
-
-                const desc = document.createElement('p');
-                desc.innerHTML = `${config.description} 
-                    <a href="${config.links.etsy}" target="_blank">Etsy</a>, 
-                    <a href="${config.links.dtrpg}" target="_blank">DriveThruRPG</a>, 
-                    <a href="${config.links.itch}" target="_blank">Itch.io</a>`;
-                wrapper.appendChild(desc);
-
-                const outputContainer = document.createElement('div');
-                outputContainer.className = 'output-container';
-                wrapper.appendChild(outputContainer);
-
-                const rerollAll = document.createElement('button');
-                rerollAll.className = 'reroll-all';
-                rerollAll.textContent = 'Reroll All';
-                rerollAll.onclick = () => {
-                    outputContainer.innerHTML = '';
-                    for (let j = 0; j < 5; j++) {
-                        const fieldIds = headers.map((_, i) => `${containerId}-${j}-${i}`);
-                        const entry = createEntry(headers, fieldIds, data, config.template);
-                        outputContainer.appendChild(entry);
-                    }
-                };
-                wrapper.appendChild(rerollAll);
-
-                document.getElementById('generators').appendChild(wrapper);
-
-                // Add to dropdown
-                const select = document.getElementById('generator-select');
-                const option = document.createElement('option');
-                option.value = containerId;
-                option.textContent = config.title;
-                select.appendChild(option);
-
-                // Initial generation
-                rerollAll.onclick();
-            });
-    }
-
-    // Scroll to generator section when dropdown is used
-    document.getElementById('generator-select').addEventListener('change', function () {
-        const targetId = this.value;
-        if (targetId) {
-            const target = document.getElementById(targetId);
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth' });
-            }
-        }
+    headers.forEach((header, i) => {
+      const btn = wrapper.querySelector(`[data-field="${fieldIds[i]}"]`);
+      const reroll = () => {
+        btn.textContent = getNewRandom(data[header], btn.textContent);
+      };
+      btn.addEventListener('click', reroll);
+      reroll();
     });
 
-    configs.forEach((cfg, idx) => createGenerator(cfg, `gen${idx}`));
+    return wrapper;
+  }
+
+  function createGenerator(config, containerId) {
+    fetch(config.csv)
+      .then(res => res.text())
+      .then(text => {
+        const parsed = parseCSV(text);
+        const headers = parsed[0];
+        const records = parsed.slice(1);
+        const data = {};
+
+        headers.forEach((header, i) => {
+          data[header] = [];
+          records.forEach(row => {
+            if (row[i] && row[i].trim() !== '') {
+              data[header].push(row[i].trim());
+            }
+          });
+        });
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'generator-block';
+        wrapper.id = containerId;
+
+        const title = document.createElement('h2');
+        title.textContent = config.title;
+        wrapper.appendChild(title);
+
+        const desc = document.createElement('p');
+        desc.innerHTML = `${config.description} 
+          <a href="${config.links.etsy}" target="_blank">Etsy</a>, 
+          <a href="${config.links.dtrpg}" target="_blank">DriveThruRPG</a>, 
+          <a href="${config.links.itch}" target="_blank">Itch.io</a>`;
+        wrapper.appendChild(desc);
+
+        const outputContainer = document.createElement('div');
+        outputContainer.className = 'output-container';
+        wrapper.appendChild(outputContainer);
+
+        const rerollAll = document.createElement('button');
+        rerollAll.className = 'reroll-all';
+        rerollAll.textContent = 'Reroll All';
+        rerollAll.onclick = () => {
+          outputContainer.innerHTML = '';
+          for (let j = 0; j < 5; j++) {
+            const fieldIds = headers.map((_, i) => `${containerId}-${j}-${i}`);
+            const entry = createEntry(headers, fieldIds, data, config.template);
+            outputContainer.appendChild(entry);
+          }
+        };
+        wrapper.appendChild(rerollAll);
+
+        document.getElementById('generators').appendChild(wrapper);
+
+        // Add to dropdown
+        const select = document.getElementById('generator-select');
+        const option = document.createElement('option');
+        option.value = containerId;
+        option.textContent = config.title;
+        select.appendChild(option);
+
+        // Initial generation
+        rerollAll.onclick();
+      });
+  }
+
+  // Scroll to generator section when dropdown is used
+  document.getElementById('generator-select').addEventListener('change', function () {
+    const targetId = this.value;
+    if (targetId) {
+      const target = document.getElementById(targetId);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  });
+
+  configs.forEach((cfg, idx) => createGenerator(cfg, `gen${idx}`));
 </script>
+
+</body>
+</html>
