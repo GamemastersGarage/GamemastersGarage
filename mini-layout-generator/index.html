@@ -259,11 +259,11 @@ async function generate() {
     if (headImg) tempCtx.drawImage(headImg, 0, 0, w, h);
     if (weaponImg) tempCtx.drawImage(weaponImg, 0, 0, w, h);
 
-    if (x + w > pageWidth - marginPx) {
-      x = marginPx;
-      y += rowHeight * 2;
-      rowHeight = 0;
-    }
+if (x + w > pageWidth - marginPx) {
+  x = marginPx;
+  y += rowHeight + tabHeight * 2;
+  rowHeight = 0;
+}
 
     if (y + (h * 2 + tabHeight * 2) > pageHeight - marginPx) {
       pageCount++;
