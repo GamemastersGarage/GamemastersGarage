@@ -208,6 +208,7 @@ function loadImage(path) {
 async function generate() {
   document.getElementById('pages').innerHTML = '';
 
+  const tabHeight = 15;
   const marginPx = 118;
   const pageWidth = 2480;
   const pageHeight = 3508;
@@ -284,8 +285,6 @@ ctx.moveTo(x, y + h);
 ctx.lineTo(x + w, y + h);
 ctx.stroke();
 ctx.restore();
-
-const tabHeight = 15;
 
 // Top tab (above mirrored part)
 ctx.save();
