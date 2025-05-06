@@ -212,7 +212,7 @@ async function generate() {
   document.getElementById('pages').innerHTML = '';
 
   const tabHeight = 70;
-  const marginPx = 118;
+  const marginPx = 40;
   const pageWidth = 2480;
   const pageHeight = 3508;
   const baseWidth = 240;
@@ -236,97 +236,126 @@ async function generate() {
   let pageCount = 1;
   let { canvas, ctx } = createNewPage(pageWidth, pageHeight, pageCount);
 
-  let x = marginPx;
-  let y = marginPx;
-  let rowHeight = 0;
-
+  let placements = [];
+  let freeAreas = [{ x: marginPx, y: marginPx, w: pageWidth - marginPx * 2, h: pageHeight - marginPx * 2 }];
+  
   for (let miniature of miniatures) {
     const scale = raceScales[miniature.race];
     const w = baseWidth * scale.w;
     const h = baseHeight * scale.h;
+    const fullHeight = h * 2 + tabHeight * 2;
+
+    let placed = false;
+
+    for (let i = 0; i < freeAreas.length; i++) {
+      const area = freeAreas[i];
+      if (w <= area.w && fullHeight <= area.h) {
+        const posX = area.x;
+        const posY = area.y;
+
+        placements.push({ miniature, x: posX, y: posY, w, h });
+
+        // Update free areas
+        freeAreas.splice(i, 1);
+        freeAreas.push(
+          { x: posX + w, y: posY, w: area.w - w, h: fullHeight }, // right
+          { x: posX, y: posY + fullHeight, w: w, h: area.h - fullHeight } // below
+        );
+        placed = true;
+        break;
+      }
+    }
+
+    if (!placed) {
+      // Start a new page
+      pageCount++;
+      ({ canvas, ctx } = createNewPage(pageWidth, pageHeight, pageCount));
+      freeAreas = [{ x: marginPx, y: marginPx, w: pageWidth - marginPx * 2, h: pageHeight - marginPx * 2 }];
+      
+      const posX = marginPx;
+      const posY = marginPx;
+      placements.push({ miniature, x: posX, y: posY, w, h });
+
+      freeAreas.shift();
+      freeAreas.push(
+        { x: posX + w, y: posY, w: pageWidth - marginPx * 2 - w, h: fullHeight },
+        { x: posX, y: posY + fullHeight, w: w, h: pageHeight - marginPx * 2 - fullHeight }
+      );
+    }
+  }
+
+  let currentPage = 1;
+  let { canvas: drawCanvas, ctx: drawCtx } = createNewPage(pageWidth, pageHeight, currentPage);
+
+  for (let i = 0; i < placements.length; i++) {
+    const { miniature, x, y, w, h } = placements[i];
+    const pageRequired = Math.floor(y / (pageHeight - marginPx * 2)) + 1;
+
+    if (pageRequired !== currentPage) {
+      currentPage = pageRequired;
+      ({ canvas: drawCanvas, ctx: drawCtx } = createNewPage(pageWidth, pageHeight, currentPage));
+    }
 
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = w;
     tempCanvas.height = h;
     const tempCtx = tempCanvas.getContext('2d');
 
-    const legImg = await loadImage(images/leg/leg_${miniature.leg}.png);
-    const headImg = await loadImage(images/head/head_${miniature.race}.png);
-    const armourImg = await loadImage(images/armour/armour_${miniature.armour}.png);
-    const weaponImg = await loadImage(images/weapon/weapon_${miniature.weapon}.png);
+    const legImg = await loadImage(`images/leg/leg_${miniature.leg}.png`);
+    const headImg = await loadImage(`images/head/head_${miniature.race}.png`);
+    const armourImg = await loadImage(`images/armour/armour_${miniature.armour}.png`);
+    const weaponImg = await loadImage(`images/weapon/weapon_${miniature.weapon}.png`);
 
     if (legImg) tempCtx.drawImage(legImg, 0, 0, w, h);
     if (armourImg) tempCtx.drawImage(armourImg, 0, 0, w, h);
     if (headImg) tempCtx.drawImage(headImg, 0, 0, w, h);
     if (weaponImg) tempCtx.drawImage(weaponImg, 0, 0, w, h);
 
-    if (x + w > pageWidth - marginPx) {
-      x = marginPx;
-      y += rowHeight * 2;
-      rowHeight = 0;
-    }
+    const adjustedY = y % (pageHeight - marginPx * 2);
 
-    if (y + (h * 2 + tabHeight * 2) > pageHeight - marginPx) {
-      pageCount++;
-      ({ canvas, ctx } = createNewPage(pageWidth, pageHeight, pageCount));
-      x = marginPx;
-      y = marginPx;
-      rowHeight = 0;
-    }
+    drawCtx.save();
+    drawCtx.translate(x + w / 2, adjustedY + h / 2);
+    drawCtx.scale(1, -1);
+    drawCtx.drawImage(tempCanvas, -w / 2, -h / 2, w, h);
+    drawCtx.restore();
 
-    ctx.save();
-    ctx.translate(x + w / 2, y + h / 2);
-    ctx.scale(1, -1);
-    ctx.drawImage(tempCanvas, -w / 2, -h / 2, w, h);
-    ctx.restore();
+    drawCtx.drawImage(tempCanvas, x, adjustedY + h, w, h);
 
-    ctx.drawImage(tempCanvas, x, y + h, w, h);
-// Draw dashed fold line between mirrored and upright parts
-ctx.save();
-ctx.setLineDash([5, 5]);
-ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
-ctx.lineWidth = 1;
-ctx.beginPath();
-ctx.moveTo(x, y + h);
-ctx.lineTo(x + w, y + h);
-ctx.stroke();
-ctx.restore();
+    // Fold line
+    drawCtx.save();
+    drawCtx.setLineDash([5, 5]);
+    drawCtx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+    drawCtx.lineWidth = 1;
+    drawCtx.beginPath();
+    drawCtx.moveTo(x, adjustedY + h);
+    drawCtx.lineTo(x + w, adjustedY + h);
+    drawCtx.stroke();
+    drawCtx.restore();
 
-ctx.save();
-ctx.setLineDash([5, 5]);
-ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
-ctx.lineWidth = 1;
+    // Top and bottom tabs
+    drawCtx.save();
+    drawCtx.setLineDash([5, 5]);
+    drawCtx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+    drawCtx.lineWidth = 1;
+    drawCtx.beginPath();
+    drawCtx.moveTo(x, adjustedY - tabHeight);
+    drawCtx.lineTo(x + w, adjustedY - tabHeight);
+    drawCtx.lineTo(x + w, adjustedY);
+    drawCtx.lineTo(x, adjustedY);
+    drawCtx.closePath();
+    drawCtx.stroke();
 
-// Top tab (above mirrored part)
-ctx.beginPath();
-ctx.moveTo(x, y - tabHeight);
-ctx.lineTo(x + w, y - tabHeight);
-ctx.lineTo(x + w, y);
-ctx.lineTo(x, y);
-ctx.closePath();
-ctx.stroke();
-
-// Bottom tab (below upright part)
-ctx.beginPath();
-ctx.moveTo(x, y + h * 2);
-ctx.lineTo(x + w, y + h * 2);
-ctx.lineTo(x + w, y + h * 2 + tabHeight);
-ctx.lineTo(x, y + h * 2 + tabHeight);
-ctx.closePath();
-ctx.stroke();
-ctx.restore();
-
-    ctx.save();
-    ctx.setLineDash([10, 5]);
-    ctx.strokeStyle = 'rgba(128, 128, 128, 0.1)';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(x, y, w, h * 2);
-    ctx.restore();
-
-    x += w;
-    rowHeight = Math.max(rowHeight, h);
+    drawCtx.beginPath();
+    drawCtx.moveTo(x, adjustedY + h * 2);
+    drawCtx.lineTo(x + w, adjustedY + h * 2);
+    drawCtx.lineTo(x + w, adjustedY + h * 2 + tabHeight);
+    drawCtx.lineTo(x, adjustedY + h * 2 + tabHeight);
+    drawCtx.closePath();
+    drawCtx.stroke();
+    drawCtx.restore();
   }
 }
+
 
 function createNewPage(width, height, pageNum) {
   const canvas = document.createElement('canvas');
