@@ -16,7 +16,6 @@
       text-align: center;
     }
 
-    /* Burger Menu Styles */
     .menu-toggle {
       position: fixed;
       top: 15px;
@@ -82,10 +81,6 @@
       margin: 20px 0;
     }
 
-    .signup {
-      margin: 20px 0;
-    }
-
     .form-button {
       padding: 12px 24px;
       font-size: 18px;
@@ -102,7 +97,6 @@
       background-color: #333;
     }
 
-    /* Original app styles */
     .controls { margin-bottom: 20px; }
     canvas { border: 1px solid #333; margin-top: 20px; display: block; margin-left: auto; margin-right: auto; }
     .miniature-input { margin-bottom: 10px; padding: 10px; border: 1px solid #ccc; background-color: #fff; display: inline-block; text-align: left; }
@@ -123,8 +117,7 @@
     }
   </style>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
 <body>
@@ -137,23 +130,22 @@
 
 <nav>
   <ul>
-   <li><a href="../">Manuals</a></li>
+    <li><a href="../">Manuals</a></li>
     <li><a href="/tools/">Tools</a></li>
     <li><a href="/mini-layout-generator/">Paper Minis Tool</a></li>
     <li><a href="https://buymeacoffee.com/gamemastersgarage" target="_blank" rel="noopener noreferrer">Buy me a coffee</a></li>
   </ul>
 </nav>
 
- <header>
+<header>
   <picture>
     <source srcset="../GamemastersGarage_Logo_WEBP_512x.webp" type="image/webp">
     <img src="../GamemastersGarage_Logo_PNG_512x.png" alt="Gamemaster's Garage Logo" width="150" />
   </picture>
-<header>
   <h1>Paper Miniatures Generator</h1>
 </header>
 
-<div id="controls"></div>
+<div id="controls" class="controls"></div>
 
 <button class="form-button" onclick="addMiniatureInput()">➕ Add Miniatures</button>
 <button class="form-button" onclick="generate()">↻ Update Sheet</button>
@@ -162,7 +154,6 @@
 
 <div id="pages"></div>
 
-<!-- Main App Script -->
 <script>
 const raceScales = {
   "orc": {w:1, h:1},
@@ -175,7 +166,6 @@ const raceScales = {
   "bug": {w:1.3, h:1.3}
 };
 
-// Just the names — no need to manage file paths manually
 const races = ["orc", "human", "elf", "dwarf", "demon", "halfling", "ogre", "bug"];
 const armours = ["steel", "loin-cloth", "robe"];
 const leg = ["default", "snake", "centaur", "arachnid"];
@@ -184,14 +174,14 @@ const weapon = ["longsword", "axe", "hammer"];
 function addMiniatureInput() {
   const div = document.createElement('div');
   div.className = 'miniature-input';
-  div.innerHTML = 
-    Race: <select class="race">${races.map(r => <option value="${r}">${r}</option>).join('')}</select>
-    Armour: <select class="armour">${armours.map(a => <option value="${a}">${a}</option>).join('')}</select>
-    Leg: <select class="leg">${leg.map(l => <option value="${l}">${l}</option>).join('')}</select>
-    Weapon: <select class="weapon">${weapon.map(w => <option value="${w}">${w}</option>).join('')}</select>
+  div.innerHTML = `
+    Race: <select class="race">${races.map(r => `<option value="${r}">${r}</option>`).join('')}</select>
+    Armour: <select class="armour">${armours.map(a => `<option value="${a}">${a}</option>`).join('')}</select>
+    Leg: <select class="leg">${leg.map(l => `<option value="${l}">${l}</option>`).join('')}</select>
+    Weapon: <select class="weapon">${weapon.map(w => `<option value="${w}">${w}</option>`).join('')}</select>
     Quantity: <input type="number" class="quantity" value="1" min="1">
     <button onclick="this.parentNode.remove()">❌ Delete</button>
-  ;
+  `;
   document.getElementById('controls').appendChild(div);
 }
 
@@ -201,10 +191,27 @@ function loadImage(path) {
     img.src = path;
     img.onload = () => resolve(img);
     img.onerror = () => {
-      console.warn(Image failed to load: ${path});
+      console.warn(`Image failed to load: ${path}`);
       resolve(null);
     };
   });
+}
+
+function createNewPage(width, height, pageNum) {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  canvas.style.pageBreakAfter = "always";
+  document.getElementById('pages').appendChild(canvas);
+
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, width, height);
+  ctx.font = "30px sans-serif";
+  ctx.fillStyle = "rgba(0,0,0,0.3)";
+  ctx.fillText(`Page ${pageNum}`, 100, 100);
+
+  return { canvas, ctx };
 }
 
 async function generate() {
@@ -254,11 +261,10 @@ async function generate() {
 
         placements.push({ miniature, x: posX, y: posY, w, h });
 
-        // Update free areas
         freeAreas.splice(i, 1);
         freeAreas.push(
-          { x: posX + w, y: posY, w: area.w - w, h: fullHeight }, // right
-          { x: posX, y: posY + fullHeight, w: w, h: area.h - fullHeight } // below
+          { x: posX + w, y: posY, w: area.w - w, h: fullHeight },
+          { x: posX, y: posY + fullHeight, w: w, h: area.h - fullHeight }
         );
         placed = true;
         break;
@@ -266,11 +272,10 @@ async function generate() {
     }
 
     if (!placed) {
-      // Start a new page
       pageCount++;
       ({ canvas, ctx } = createNewPage(pageWidth, pageHeight, pageCount));
       freeAreas = [{ x: marginPx, y: marginPx, w: pageWidth - marginPx * 2, h: pageHeight - marginPx * 2 }];
-      
+
       const posX = marginPx;
       const posY = marginPx;
       placements.push({ miniature, x: posX, y: posY, w, h });
@@ -320,7 +325,6 @@ async function generate() {
 
     drawCtx.drawImage(tempCanvas, x, adjustedY + h, w, h);
 
-    // Fold line
     drawCtx.save();
     drawCtx.setLineDash([5, 5]);
     drawCtx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
@@ -331,7 +335,6 @@ async function generate() {
     drawCtx.stroke();
     drawCtx.restore();
 
-    // Top and bottom tabs
     drawCtx.save();
     drawCtx.setLineDash([5, 5]);
     drawCtx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
@@ -355,24 +358,6 @@ async function generate() {
   }
 }
 
-
-function createNewPage(width, height, pageNum) {
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  canvas.style.pageBreakAfter = "always";
-  document.getElementById('pages').appendChild(canvas);
-
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = 'white';
-  ctx.fillRect(0, 0, width, height);
-  ctx.font = "30px sans-serif";
-  ctx.fillStyle = "rgba(0,0,0,0.3)";
-  ctx.fillText(Page ${pageNum}, 100, 100);
-
-  return { canvas, ctx };
-}
-
 async function saveAsPDF() {
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({
@@ -386,9 +371,7 @@ async function saveAsPDF() {
     const canvas = canvases[i];
     const imgData = canvas.toDataURL('image/jpeg', 1.0);
 
-    if (i > 0) {
-      pdf.addPage();
-    }
+    if (i > 0) pdf.addPage();
 
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
@@ -398,7 +381,6 @@ async function saveAsPDF() {
   pdf.save('miniatures.pdf');
 }
 </script>
-
 
 </body>
 </html>
