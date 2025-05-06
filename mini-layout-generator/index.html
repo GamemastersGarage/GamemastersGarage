@@ -286,26 +286,28 @@ ctx.lineTo(x + w, y + h);
 ctx.stroke();
 ctx.restore();
 
-// Top tab (above mirrored part)
 ctx.save();
+ctx.setLineDash([5, 5]);
+ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+ctx.lineWidth = 1;
+
+// Top tab (above mirrored part)
 ctx.beginPath();
 ctx.moveTo(x, y - tabHeight);
 ctx.lineTo(x + w, y - tabHeight);
 ctx.lineTo(x + w, y);
 ctx.lineTo(x, y);
 ctx.closePath();
-ctx.fill();
-ctx.restore();
+ctx.stroke();
 
 // Bottom tab (below upright part)
-ctx.save();
 ctx.beginPath();
 ctx.moveTo(x, y + h * 2);
 ctx.lineTo(x + w, y + h * 2);
 ctx.lineTo(x + w, y + h * 2 + tabHeight);
 ctx.lineTo(x, y + h * 2 + tabHeight);
 ctx.closePath();
-ctx.fill();
+ctx.stroke();
 ctx.restore();
 
     ctx.save();
