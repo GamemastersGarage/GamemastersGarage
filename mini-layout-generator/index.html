@@ -157,11 +157,8 @@
 
 <button class="form-button" onclick="addMiniatureInput()">➕ Add Miniatures</button>
 <button class="form-button" onclick="generate()">↻ Update Sheet</button>
-<button class="form-button" onclick="generatePacked()">📦 Efficient Layout</button>
 <button class="form-button" onclick="window.print()">🖨️ Print Pages</button>
 <button class="form-button" onclick="saveAsPDF()">💾 Save as PDF</button>
-
-
 
 <div id="pages"></div>
 
@@ -210,7 +207,7 @@ function loadImage(path) {
   });
 }
 
-async function generatePacked() {
+async function generate() {
   document.getElementById('pages').innerHTML = '';
 
   const tabHeight = 70;
@@ -235,8 +232,13 @@ async function generatePacked() {
     }
   }
 
-  // Preload and store all rendered miniatures with dimensions
-  let rendered = [];
+  let pageCount = 1;
+  let { canvas, ctx } = createNewPage(pageWidth, pageHeight, pageCount);
+
+  let x = marginPx;
+  let y = marginPx;
+  let rowHeight = 0;
+
   for (let miniature of miniatures) {
     const scale = raceScales[miniature.race];
     const w = baseWidth * scale.w;
@@ -257,26 +259,13 @@ async function generatePacked() {
     if (headImg) tempCtx.drawImage(headImg, 0, 0, w, h);
     if (weaponImg) tempCtx.drawImage(weaponImg, 0, 0, w, h);
 
-    rendered.push({ canvas: tempCanvas, w, h });
-  }
-
-  // Efficient shelf-packing
-  let pageCount = 1;
-  let { canvas, ctx } = createNewPage(pageWidth, pageHeight, pageCount);
-  let x = marginPx;
-  let y = marginPx;
-  let rowHeight = 0;
-
-  for (let r of rendered) {
-    const totalH = r.h * 2 + tabHeight * 2;
-
-    if (x + r.w > pageWidth - marginPx) {
+    if (x + w > pageWidth - marginPx) {
       x = marginPx;
-      y += rowHeight;
+      y += rowHeight * 2;
       rowHeight = 0;
     }
 
-    if (y + totalH > pageHeight - marginPx) {
+    if (y + (h * 2 + tabHeight * 2) > pageHeight - marginPx) {
       pageCount++;
       ({ canvas, ctx } = createNewPage(pageWidth, pageHeight, pageCount));
       x = marginPx;
@@ -284,52 +273,57 @@ async function generatePacked() {
       rowHeight = 0;
     }
 
-    // Draw mirrored part (top half)
     ctx.save();
-    ctx.translate(x + r.w / 2, y + r.h / 2);
+    ctx.translate(x + w / 2, y + h / 2);
     ctx.scale(1, -1);
-    ctx.drawImage(r.canvas, -r.w / 2, -r.h / 2, r.w, r.h);
+    ctx.drawImage(tempCanvas, -w / 2, -h / 2, w, h);
     ctx.restore();
 
-    // Draw upright part (bottom half)
-    ctx.drawImage(r.canvas, x, y + r.h, r.w, r.h);
+    ctx.drawImage(tempCanvas, x, y + h, w, h);
+// Draw dashed fold line between mirrored and upright parts
+ctx.save();
+ctx.setLineDash([5, 5]);
+ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+ctx.lineWidth = 1;
+ctx.beginPath();
+ctx.moveTo(x, y + h);
+ctx.lineTo(x + w, y + h);
+ctx.stroke();
+ctx.restore();
 
-    // Fold line
+ctx.save();
+ctx.setLineDash([5, 5]);
+ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+ctx.lineWidth = 1;
+
+// Top tab (above mirrored part)
+ctx.beginPath();
+ctx.moveTo(x, y - tabHeight);
+ctx.lineTo(x + w, y - tabHeight);
+ctx.lineTo(x + w, y);
+ctx.lineTo(x, y);
+ctx.closePath();
+ctx.stroke();
+
+// Bottom tab (below upright part)
+ctx.beginPath();
+ctx.moveTo(x, y + h * 2);
+ctx.lineTo(x + w, y + h * 2);
+ctx.lineTo(x + w, y + h * 2 + tabHeight);
+ctx.lineTo(x, y + h * 2 + tabHeight);
+ctx.closePath();
+ctx.stroke();
+ctx.restore();
+
     ctx.save();
-    ctx.setLineDash([5, 5]);
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(x, y + r.h);
-    ctx.lineTo(x + r.w, y + r.h);
-    ctx.stroke();
+    ctx.setLineDash([10, 5]);
+    ctx.strokeStyle = 'rgba(128, 128, 128, 0.1)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y, w, h * 2);
     ctx.restore();
 
-    // Top and bottom tabs
-    ctx.save();
-    ctx.setLineDash([5, 5]);
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
-    ctx.lineWidth = 1;
-
-    ctx.beginPath();
-    ctx.moveTo(x, y - tabHeight);
-    ctx.lineTo(x + r.w, y - tabHeight);
-    ctx.lineTo(x + r.w, y);
-    ctx.lineTo(x, y);
-    ctx.closePath();
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(x, y + r.h * 2);
-    ctx.lineTo(x + r.w, y + r.h * 2);
-    ctx.lineTo(x + r.w, y + r.h * 2 + tabHeight);
-    ctx.lineTo(x, y + r.h * 2 + tabHeight);
-    ctx.closePath();
-    ctx.stroke();
-    ctx.restore();
-
-    x += r.w;
-    rowHeight = Math.max(rowHeight, totalH);
+    x += w;
+    rowHeight = Math.max(rowHeight, h);
   }
 }
 
