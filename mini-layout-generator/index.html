@@ -208,7 +208,7 @@ function loadImage(path) {
 async function generate() {
   document.getElementById('pages').innerHTML = '';
 
-  const tabHeight = 15;
+  const tabHeight = 40;
   const marginPx = 118;
   const pageWidth = 2480;
   const pageHeight = 3508;
@@ -288,7 +288,6 @@ ctx.restore();
 
 // Top tab (above mirrored part)
 ctx.save();
-ctx.fillStyle = '#ccc';
 ctx.beginPath();
 ctx.moveTo(x, y - tabHeight);
 ctx.lineTo(x + w, y - tabHeight);
@@ -300,7 +299,6 @@ ctx.restore();
 
 // Bottom tab (below upright part)
 ctx.save();
-ctx.fillStyle = '#ccc';
 ctx.beginPath();
 ctx.moveTo(x, y + h * 2);
 ctx.lineTo(x + w, y + h * 2);
