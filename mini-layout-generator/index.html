@@ -178,6 +178,7 @@ const raceScales = {
 // Just the names — no need to manage file paths manually
 const races = ["orc", "human", "elf", "dwarf", "demon", "halfling", "ogre", "bug"];
 const armours = ["steel", "loin-cloth", "robe"];
+const leg = ["default", "snake", "centaur", "arachnid"];
 const weapon = ["longsword", "axe", "hammer"];
 
 function addMiniatureInput() {
@@ -186,6 +187,7 @@ function addMiniatureInput() {
   div.innerHTML = `
     Race: <select class="race">${races.map(r => `<option value="${r}">${r}</option>`).join('')}</select>
     Armour: <select class="armour">${armours.map(a => `<option value="${a}">${a}</option>`).join('')}</select>
+    Leg: <select class="leg">${leg.map(l => `<option value="${l}">${l}</option>`).join('')}</select>
     Weapon: <select class="weapon">${weapon.map(w => `<option value="${w}">${w}</option>`).join('')}</select>
     Quantity: <input type="number" class="quantity" value="1" min="1">
     <button onclick="this.parentNode.remove()">❌ Delete</button>
@@ -221,11 +223,12 @@ async function generate() {
   for (let div of inputDivs) {
     const race = div.querySelector('.race').value;
     const armour = div.querySelector('.armour').value;
+    const leg = div.querySelector('.leg').value;
     const weapon = div.querySelector('.weapon').value;
     const quantity = parseInt(div.querySelector('.quantity').value);
 
     for (let i = 0; i < quantity; i++) {
-      miniatures.push({ race, armour, weapon });
+      miniatures.push({ race, armour, leg, weapon });
     }
   }
 
@@ -246,10 +249,12 @@ async function generate() {
     tempCanvas.height = h;
     const tempCtx = tempCanvas.getContext('2d');
 
+    const legImg = await loadImage(`images/leg/leg_${miniature.leg}.png`);
     const headImg = await loadImage(`images/head/head_${miniature.race}.png`);
     const armourImg = await loadImage(`images/armour/armour_${miniature.armour}.png`);
     const weaponImg = await loadImage(`images/weapon/weapon_${miniature.weapon}.png`);
 
+    if (legImg) tempCtx.drawImage(legImg, 0, 0, w, h);
     if (armourImg) tempCtx.drawImage(armourImg, 0, 0, w, h);
     if (headImg) tempCtx.drawImage(headImg, 0, 0, w, h);
     if (weaponImg) tempCtx.drawImage(weaponImg, 0, 0, w, h);
