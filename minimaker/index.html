@@ -15,25 +15,100 @@
       padding: 0;
       text-align: center;
     }
-    .menu-toggle { /* unchanged */ }
-    nav { /* unchanged */ }
-    header { /* unchanged */ }
-    .signup { /* unchanged */ }
-    .form-button { /* unchanged */ }
-    .form-button:hover { /* unchanged */ }
-    .controls { margin-bottom: 20px; }
-    canvas { border: 1px solid #333; margin-top: 20px; display: block; margin: 0 auto; }
-    .miniature-input {
-      margin-bottom: 10px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      background-color: #fff;
-      display: inline-block;
+
+    /* Burger Menu Styles */
+    .menu-toggle {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      width: 30px;
+      height: 25px;
+      cursor: pointer;
+      z-index: 2000;
+    }
+
+    .menu-toggle span {
+      display: block;
+      height: 4px;
+      background: #000;
+      margin: 5px 0;
+      transition: 0.3s;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: #fbf6ef;
+      width: 200px;
+      height: 100vh;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+      z-index: 1500;
+      padding-top: 60px;
       text-align: left;
     }
-    .miniature-input select,
-    .miniature-input input { margin-right: 10px; }
+
+    nav.active {
+      transform: translateX(0);
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0 20px;
+    }
+
+    nav li {
+      margin: 20px 0;
+    }
+
+    nav a {
+      color: #000;
+      text-decoration: none;
+      font-size: 18px;
+    }
+
+    header {
+      padding: 60px 20px 40px;
+    }
+
+    header img {
+      max-width: 150px;
+    }
+
+    h1 {
+      font-size: 2em;
+      margin: 20px 0;
+    }
+
+    .signup {
+      margin: 20px 0;
+    }
+
+    .form-button {
+      padding: 12px 24px;
+      font-size: 18px;
+      font-family: 'League Spartan', sans-serif;
+      background-color: #000;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+
+    .form-button:hover {
+      background-color: #333;
+    }
+
+    /* Original app styles */
+    .controls { margin-bottom: 20px; }
+    canvas { border: 1px solid #333; margin-top: 20px; display: block; margin-left: auto; margin-right: auto; }
+    .miniature-input { margin-bottom: 10px; padding: 10px; border: 1px solid #ccc; background-color: #fff; display: inline-block; text-align: left; }
+    .miniature-input select, .miniature-input input { margin-right: 10px; }
     button { margin-right: 10px; margin-top: 10px; }
+
     @media print {
       body * { visibility: hidden; }
       #pages canvas {
@@ -51,32 +126,35 @@
 </head>
 <body>
 
-<div class="menu-toggle" onclick="document.querySelector('nav').classList.toggle('active')">
-  <span></span><span></span><span></span>
-</div>
-<nav>
-  <ul>
-    <li><a href="../">Manuals</a></li>
-    <li><a href="/tools/">Tools</a></li>
-    <li><a href="/mini-layout-generator/">Paper Minis Tool</a></li>
-    <li><a href="https://buymeacoffee.com/gamemastersgarage" target="_blank" rel="noopener noreferrer">Buy me a coffee</a></li>
-  </ul>
-</nav>
+  <div class="menu-toggle" onclick="document.querySelector('nav').classList.toggle('active')">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
 
-<header>
-  <picture>
-    <source srcset="../GamemastersGarage_Logo_WEBP_512x.webp" type="image/webp">
-    <img src="../GamemastersGarage_Logo_PNG_512x.png" alt="Gamemaster's Garage Logo" width="150" />
-  </picture>
-  <h1>Paper Miniatures Generator</h1>
-</header>
+  <nav>
+    <ul>
+     <li><a href="../">Manuals</a></li>
+      <li><a href="/tools/">Tools</a></li>
+      <li><a href="/mini-layout-generator/">Paper Minis Tool</a></li>
+      <li><a href="https://buymeacoffee.com/gamemastersgarage" target="_blank" rel="noopener noreferrer">Buy me a coffee</a></li>
+    </ul>
+  </nav>
 
-<div id="controls"></div>
-<button class="form-button" onclick="addMiniatureInput()">➕ Add Miniature</button>
-<button class="form-button" onclick="window.print()">🖨️ Print Pages</button>
-<button class="form-button" onclick="saveAsPDF()">💾 Save as PDF</button>
+  <header>
+    <picture>
+      <source srcset="../GamemastersGarage_Logo_WEBP_512x.webp" type="image/webp">
+      <img src="../GamemastersGarage_Logo_PNG_512x.png" alt="Gamemaster's Garage Logo" width="150" />
+    </picture>
+    <h1>Paper Miniatures Generator</h1>
+  </header>
 
-<div id="pages"></div>
+  <div id="controls"></div>
+  <button class="form-button" onclick="addMiniatureInput()">➕ Add Miniature</button>
+  <button class="form-button" onclick="window.print()">🖨️ Print Pages</button>
+  <button class="form-button" onclick="saveAsPDF()">💾 Save as PDF</button>
+
+  <div id="pages"></div>
 
 <script>
 // --- OPTION DEFINITIONS ---
