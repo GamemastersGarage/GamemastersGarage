@@ -143,25 +143,14 @@ function addMiniatureInput() {
   document.getElementById('controls').appendChild(div);
 
   // Attach change listeners to regenerate on any change; update defaults on Body change
-function addMiniatureInput() {
-  // … your existing code …
-
-  // After you append `div`:
   div.querySelectorAll('select, input').forEach(el => {
     el.addEventListener('change', () => {
-      // clamp quantity
-      if (el.classList.contains('quantity')) {
-        let v = parseInt(el.value, 10) || 1;
-        if (v > 10) v = 10;
-        if (v < 1)  v = 1;
-        el.value = v;
-      }
-      // reset colour/size defaults on body change
       if (el.classList.contains('body')) applyDefaults(div);
       generate();
     });
   });
 
+  // Initial defaults & first draw
   applyDefaults(div);
   generate();
 }
