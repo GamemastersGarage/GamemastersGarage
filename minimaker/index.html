@@ -335,6 +335,10 @@ function addMiniatureInput() {
 
     async function generate() {
       const pagesDiv = document.getElementById('pages');
+        const pagesDiv = document.getElementById('pages');
+        // ── remember scroll position ──
+        const prevScrollTop  = pagesDiv.scrollTop;
+        const prevScrollLeft = pagesDiv.scrollLeft;
       pagesDiv.innerHTML = '';
       const tabH = 140, margin = 25 + tabH,
             pageW = 2480, pageH = 3508,
@@ -446,6 +450,9 @@ function addMiniatureInput() {
         x += w;
         rowH = Math.max(rowH, h*2);
       }
+           // restore scroll position
+       pagesDiv.scrollTop  = prevScrollTop;
+       pagesDiv.scrollLeft = prevScrollLeft;
     }
 
     function createNewPage(pageNum) {
