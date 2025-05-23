@@ -296,14 +296,14 @@ async function generate() {
     // 3) Clothes
     if (m.clothes!=='None') {
       const c = await loadImage(
-        `images/armour/armour_${m.clothes}.png`
+        `images/clothes/clothes_${m.clothes}.png`
       );
       if (c) tctx.drawImage(c,0,0,w,h);
     }
 
     // 4) Legs (on top of clothes)
     if (m.legs!=='None') {
-      const lg = await loadImage(`images/leg/leg_${m.legs}.png`);
+      const lg = await loadImage(`images/legs/legs_${m.legs}.png`);
       if (lg) tctx.drawImage(lg,0,0,w,h);
     }
 
