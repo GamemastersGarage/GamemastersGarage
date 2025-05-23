@@ -238,7 +238,6 @@ function addMiniatureInput() {
 
   // 3) Redraw pages with the (possibly adjusted) values
   generate();
-      });
     });
   });
 
@@ -291,8 +290,6 @@ async function generate() {
     tmp.width = w; tmp.height = h;
     const tctx = tmp.getContext('2d');
 
-    // 1) Body (tinted)
-    const bodyImg = await loadImage(`images/body/body_${m.body}.png`);
     // 1) Body (tinted via mask + multiply)
 const bodyImg = await loadImage(`images/body/body_${m.body}.png`);
 if (bodyImg) {
