@@ -178,7 +178,7 @@
           Changes appear in the preview pane in real time.
         </div>
         <button class="form-button" onclick="addMiniatureInput()">➕ Add Miniature</button>
-        <button class="form-button" onclick="window.print()">🖨️ Print Pages</button>
+        <button class="form-button" onclick="printMiniatures()">🖨️ Print Pages</button>
         <button class="form-button" onclick="saveAsPDF()">💾 Save as PDF</button>
       </div>
     </div>
@@ -411,6 +411,33 @@
       }
       pdf.save('miniatures.pdf');
     }
+function printMiniatures() {
+  const printWin = window.open('', 'PRINT', 'width=800,height=600');
+  printWin.document.write(`
+    <html>
+      <head>
+        <title>Print Miniatures</title>
+        <style>
+          body { margin:0; padding:0; }
+          img { display:block; width:100%; page-break-after:always; }
+        </style>
+      </head>
+      <body></body>
+    </html>
+  `);
+  printWin.document.close();
+
+  // Clone each canvas as an <img> into the print window
+  document.querySelectorAll('#pages canvas').forEach(canvas => {
+    const img = new Image();
+    img.src = canvas.toDataURL('image/png');
+    printWin.document.body.appendChild(img);
+  });
+
+  printWin.focus();
+  printWin.print();
+  // printWin.close(); // uncomment if you want to auto-close after printing
+}
   </script>
 </body>
 </html>
