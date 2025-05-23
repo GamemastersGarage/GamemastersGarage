@@ -16,28 +16,12 @@
       overflow: hidden;
       display: flex;
     }
-    .menu-toggle {
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      width: 30px;
-      height: 25px;
-      cursor: pointer;
-      z-index: 2000;
-    }
-    .menu-toggle span {
-      display: block;
-      height: 4px;
-      background: #000;
-      margin: 5px 0;
-      transition: 0.3s;
-    }
+
+    /* NAV */
     nav {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 200px;
-      height: 100vh;
+      top: 0; left: 0;
+      width: 200px; height: 100vh;
       background-color: #fbf6ef;
       transform: translateX(-100%);
       transition: transform 0.3s ease;
@@ -46,27 +30,20 @@
       text-align: left;
       z-index: 1500;
     }
-    nav.active {
-      transform: translateX(0);
-    }
-    nav ul {
-      list-style: none;
-      padding: 0 20px;
-    }
-    nav li {
-      margin: 20px 0;
-    }
-    nav a {
-      color: #000;
-      text-decoration: none;
-      font-size: 18px;
-    }
+    nav.active { transform: translateX(0); }
+    nav ul { list-style: none; padding: 0 20px; }
+    nav li { margin: 20px 0; }
+    nav a { color: #000; text-decoration: none; font-size: 18px; }
+
+    /* MAIN SPLIT */
     #main {
       display: flex;
       flex: 1;
       margin-left: 200px;
       overflow: hidden;
     }
+
+    /* CONTROLS */
     #controls {
       width: 350px;
       background-color: #fbf6ef;
@@ -79,15 +56,31 @@
       padding: 20px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
+    /* burger menu now inside control-box */
+    .menu-toggle {
+      position: static;
+      display: block;
+      width: 30px; height: 25px;
+      margin-bottom: 15px;
+      cursor: pointer;
+    }
+    .menu-toggle span {
+      display: block;
+      height: 4px;
+      background: #000;
+      margin: 5px 0;
+      transition: 0.3s;
+    }
     #control-box img {
       width: 100px;
       display: block;
-      margin-bottom: 10px;
+      margin: 0 auto 10px;
     }
     #control-box .instructions {
       font-size: 14px;
       margin-bottom: 15px;
       line-height: 1.4;
+      text-align: center;
     }
     #control-box .form-button {
       display: block;
@@ -110,6 +103,8 @@
       overflow-y: auto;
       padding: 10px 20px;
     }
+
+    /* PREVIEW */
     #pages {
       flex: 1;
       overflow-y: auto;
@@ -125,6 +120,8 @@
       margin: 10px 0;
       border: 1px solid #333;
     }
+
+    /* MINIATURE INPUTS */
     .miniature-input {
       margin-bottom: 12px;
       padding: 10px;
@@ -140,28 +137,49 @@
     .miniature-input button {
       margin-top: 8px;
     }
+
+    /* PRINT STYLES */
     @media print {
       body * { visibility: hidden; }
+      #pages, #pages canvas { visibility: visible !important; }
+      #pages {
+        overflow: visible !important;
+        position: static !important;
+        height: auto !important;
+      }
       #pages canvas {
-        visibility: visible;
-        position: relative;
-        width: 210mm;
-        height: 297mm;
+        position: relative !important;
+        width: 210mm !important;
+        height: 297mm !important;
         border: none !important;
-        page-break-after: always;
+        page-break-after: always !important;
       }
-      #pages canvas:last-child {
-        page-break-after: auto !important;
-      }
-      @page { size: A4 portrait; margin: 0; }
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
-
-  <div class="menu-toggle" onclick="document.querySelector('nav').classList.toggle('active')">
-    <span></span><span></span><span></span>
+  <div id="main">
+    <div id="controls">
+      <div id="control-box">
+        <div class="menu-toggle" onclick="document.querySelector('nav').classList.toggle('active')">
+          <span></span><span></span><span></span>
+        </div>
+        <picture>
+          <source srcset="../GamemastersGarage_Logo_WEBP_512x.webp" type="image/webp">
+          <img src="../GamemastersGarage_Logo_PNG_512x.png" alt="Logo">
+        </picture>
+        <div class="instructions">
+          Select or add your miniatures below.<br>
+          Changes appear in the preview pane in real time.
+        </div>
+        <button class="form-button" onclick="addMiniatureInput()">➕ Add Miniature</button>
+        <button class="form-button" onclick="window.print()">🖨️ Print Pages</button>
+        <button class="form-button" onclick="saveAsPDF()">💾 Save as PDF</button>
+      </div>
+      <div id="miniature-inputs"></div>
+    </div>
+    <div id="pages"></div>
   </div>
 
   <nav>
@@ -172,25 +190,6 @@
       <li><a href="https://buymeacoffee.com/gamemastersgarage" target="_blank" rel="noopener noreferrer">Buy me a coffee</a></li>
     </ul>
   </nav>
-
-  <div id="main">
-    <div id="controls">
-      <div id="control-box">
-        <picture>
-          <source srcset="../GamemastersGarage_Logo_WEBP_512x.webp" type="image/webp">
-          <img src="../GamemastersGarage_Logo_PNG_512x.png" alt="Logo">
-        </picture>
-        <div class="instructions">
-          Select or add your miniatures below. Changes appear in the preview pane at right in real time.
-        </div>
-        <button class="form-button" onclick="addMiniatureInput()">➕ Add Miniature</button>
-        <button class="form-button" onclick="window.print()">🖨️ Print Pages</button>
-        <button class="form-button" onclick="saveAsPDF()">💾 Save as PDF</button>
-      </div>
-      <div id="miniature-inputs"></div>
-    </div>
-    <div id="pages"></div>
-  </div>
 
   <script>
     const bodyOptions   = ['Dwarf','Orc','Ogre','Human','Skeleton','Elf','Bug','Robot','Cat','Lizard','Devil'];
@@ -250,7 +249,6 @@
         <button onclick="this.parentNode.remove(); generate();">❌ Delete</button>
       `;
       document.getElementById('miniature-inputs').appendChild(div);
-
       div.querySelectorAll('select, input').forEach(el => {
         el.addEventListener('change', () => {
           if (el.classList.contains('body')) applyDefaults(div);
@@ -262,7 +260,6 @@
           generate();
         });
       });
-
       applyDefaults(div);
       generate();
     }
@@ -390,8 +387,7 @@
 
     function createNewPage(pageNum) {
       const canvas = document.createElement('canvas');
-      canvas.width = 2480;
-      canvas.height = 3508;
+      canvas.width = 2480; canvas.height = 3508;
       canvas.style.pageBreakAfter = "always";
       document.getElementById('pages').appendChild(canvas);
       const ctx = canvas.getContext('2d');
