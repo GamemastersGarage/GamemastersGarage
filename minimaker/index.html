@@ -413,39 +413,61 @@
     }
 function printMiniatures() {
   const printWin = window.open('', 'PRINT', 'width=800,height=600');
+  const doc = printWin.document;
 
-  printWin.document.write(`
+  // 1) Write a fresh HTML document with clean print CSS
+  doc.open();
+  doc.write(`
     <html>
       <head>
         <title>Print Miniatures</title>
         <style>
-          @page { margin: 0; size: auto; }
+          @page { size: A4 portrait; margin: 0; }
           html, body { margin: 0; padding: 0; }
-          img {
+
+          /* wrapper forces a break after every page */
+          .page {
+            page-break-after: always;
+          }
+          /* no border or padding so it truly fills */
+          .page img {
             display: block;
             width: 100%;
             height: auto;
           }
-          img + img {
-            page-break-before: always;
+          /* avoid leaving a final blank page */
+          .page:last-child {
+            page-break-after: auto;
           }
         </style>
       </head>
       <body></body>
     </html>
   `);
-  printWin.document.close();
+  doc.close();
 
-  // append each canvas as an <img>
-  document.querySelectorAll('#pages canvas').forEach(canvas => {
-    const img = new Image();
-    img.src = canvas.toDataURL('image/png');
-    printWin.document.body.appendChild(img);
+  // 2) Build a list of promises to know when every image is loaded
+  const canvases = document.querySelectorAll('#pages canvas');
+  const loadPromises = Array.from(canvases).map((canvas, idx) => {
+    return new Promise(resolve => {
+      const wrapper = doc.createElement('div');
+      wrapper.className = 'page';
+
+      const img = new Image();
+      img.src = canvas.toDataURL('image/png');
+      // when the image is painted at full size, resolve
+      img.onload = () => resolve();
+      wrapper.appendChild(img);
+      doc.body.appendChild(wrapper);
+    });
   });
 
-  printWin.focus();
-  printWin.print();
-  // printWin.close(); // if you want to auto-close afterwards
+  // 3) Once all images are ready, fire print
+  Promise.all(loadPromises).then(() => {
+    printWin.focus();
+    printWin.print();
+    // printWin.close(); // optional
+  });
 }
   </script>
 </body>
