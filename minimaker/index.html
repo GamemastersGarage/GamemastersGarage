@@ -273,7 +273,7 @@
     async function generate() {
       const pagesDiv = document.getElementById('pages');
       pagesDiv.innerHTML = '';
-      const tabH = 140, margin = 118 + tabH,
+      const tabH = 140, margin = 25 + tabH,
             pageW = 2480, pageH = 3508,
             baseW = 400, baseH = 512;
       const miniatures = [];
@@ -381,7 +381,7 @@
         ctx.restore();
 
         x += w;
-        rowH = Math.max(rowH, h*2 + tabH*2);
+        rowH = Math.max(rowH, h*2);
       }
     }
 
