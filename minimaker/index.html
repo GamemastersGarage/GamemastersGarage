@@ -280,11 +280,16 @@ async function generate() {
     // 1) Body (tinted)
     const bodyImg = await loadImage(`images/body/body_${m.body}.png`);
     if (bodyImg) {
-      tctx.drawImage(bodyImg,0,0,w,h);
-      tctx.globalCompositeOperation = 'source-in';
-      tctx.fillStyle = m.colour;
-      tctx.fillRect(0,0,w,h);
-      tctx.globalCompositeOperation = 'source-over';
+  // a) lay down a solid block of the chosen colour
+  tctx.fillStyle = m.colour;
+  tctx.fillRect(0, 0, w, h);
+
+  // b) multiply your PNG over it so black stays black, white shows the colour
+  tctx.globalCompositeOperation = 'multiply';
+  tctx.drawImage(bodyImg, 0, 0, w, h);
+
+  // c) restore default blending for the rest of the draw calls
+  tctx.globalCompositeOperation = 'source-over';
     }
 
     // 2) Hand-1 (under everything, slight offset)
