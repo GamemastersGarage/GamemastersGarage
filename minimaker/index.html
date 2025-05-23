@@ -341,7 +341,7 @@ if (bodyImg) {
 
     // Page‐layout logic
     if (x + w > pageW - margin) {
-      x = margin; y += rowH + tabH*2; rowH = 0;
+      x = margin; y += rowH; rowH = 0;
     }
     if (y + (h*2 + tabH*2) > pageH - margin) {
       pageNum++;
