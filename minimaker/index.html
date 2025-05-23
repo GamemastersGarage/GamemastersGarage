@@ -57,7 +57,8 @@
     }
     /* burger menu now inside control-box */
     .menu-toggle {
-      position: static;
+      position: relative;      /* enable z-index */
+      z-index: 2000;           /* sit above nav (which is 1500) */
       display: block;
       width: 30px; height: 25px;
       margin-bottom: 15px;
