@@ -141,7 +141,25 @@
     .miniature-input button {
       margin-top: 8px;
     }
+    /* ── form flex rows ── */
+    .input-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
 
+    .input-row label {
+      flex: 0 0 80px;       /* fixed label width—tweak to suit */
+      text-align: left;     /* left-align the text */
+      margin-right: 10px;   /* space before the dropdown */
+      font-weight: bold;
+    }
+
+    .input-row select,
+    .input-row input {
+      flex: 1;              /* fill the remaining space */
+      margin-right: 0;      /* override any old margins */
+    }
     /* PRINT STYLES */
     @media print {
       body * { visibility: hidden; }
@@ -158,26 +176,6 @@
         border: none !important;
         page-break-after: always !important;
       }
-/* ── form flex rows ── */
-.input-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.input-row label {
-  flex: 0 0 80px;       /* fixed label width—tweak to suit */
-  text-align: left;     /* left-align the text */
-  margin-right: 10px;   /* space before the dropdown */
-  font-weight: bold;
-}
-
-.input-row select,
-.input-row input {
-  flex: 1;              /* fill the remaining space */
-  margin-right: 0;      /* override any old margins */
-}
-
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
