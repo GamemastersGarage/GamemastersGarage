@@ -411,9 +411,6 @@ function createNewPage(pageNum) {
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = 'white';
   ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.font = "30px sans-serif";
-  ctx.fillStyle = "rgba(0,0,0,0.3)";
-  ctx.fillText(`Page ${pageNum}`, 100, 100);
   return {canvas, ctx};
 }
 
