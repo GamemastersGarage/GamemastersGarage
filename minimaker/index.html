@@ -178,7 +178,7 @@
           Changes appear in the preview pane in real time.
         </div>
         <button class="form-button" onclick="addMiniatureInput()">➕ Add Miniature</button>
-        <button class="form-button" onclick="printViaPDF()">🖨️ Print Pages</button>
+        <button class="form-button" onclick="printViaPDF_Tab()">🖨️ Print Pages</button>
         <button class="form-button" onclick="saveAsPDF()">💾 Save as PDF</button>
       </div>
     </div>
@@ -411,11 +411,11 @@
       }
       pdf.save('miniatures.pdf');
     }
-function printViaPDF() {
+  function printViaPDF_Tab() {
   const { jsPDF } = window.jspdf;
-  // 1) Build the PDF exactly as you do in saveAsPDF()
   const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
   const canvases = document.querySelectorAll('#pages canvas');
+
   canvases.forEach((canvas, idx) => {
     const imgData = canvas.toDataURL('image/jpeg', 1.0);
     if (idx > 0) pdf.addPage();
@@ -429,25 +429,8 @@ function printViaPDF() {
     );
   });
 
-  // 2) Embed and auto-print
-  pdf.autoPrint();                                      // instruct PDF to pop its print dialog
-  const blob = pdf.output('blob');                      // get a Blob
-  const url  = URL.createObjectURL(blob);               // turn it into an object URL
-  const iframe = document.createElement('iframe');      // hidden print frame
-  iframe.style.display = 'none';
-  iframe.src = url;
-  document.body.appendChild(iframe);
-
-iframe.onload = () => {
-  setTimeout(() => {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-    setTimeout(() => {
-      URL.revokeObjectURL(url);
-      document.body.removeChild(iframe);
-    }, 2000); // cleanup
-  }, 500); // delay before print() – tweak if needed
-};
+  const blobURL = pdf.output('bloburl');
+  window.open(blobURL, '_blank'); // Open in a new tab; user presses Ctrl+P
 }
   </script>
 </body>
