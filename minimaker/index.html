@@ -215,16 +215,30 @@ function addMiniatureInput() {
     Legs:   <select class="legs">${legsOptions.map(o=>`<option>${o}</option>`).join('')}</select><br>
     Hand-1: <select class="hand1">${weaponOptions.map(o=>`<option>${o}</option>`).join('')}</select>
     Hand-2: <select class="hand2">${weaponOptions.map(o=>`<option>${o}</option>`).join('')}</select>
-    Qty:    <input type="number" class="quantity" value="1" min="1">
+    Qty:    <input type="number" class="quantity" value="1" min="1" max="10">
     <button onclick="this.parentNode.remove(); generate();">❌ Delete</button>
   `;
   document.getElementById('controls').appendChild(div);
 
   // Attach change listeners to regenerate on any change; update defaults on Body change
   div.querySelectorAll('select, input').forEach(el => {
-    el.addEventListener('change', () => {
-      if (el.classList.contains('body')) applyDefaults(div);
-      generate();
+  el.addEventListener('change', () => {
+  // 1) If the body selector changed, restore defaults:
+  if (el.classList.contains('body')) {
+    applyDefaults(div);
+  }
+
+  // 2) If it’s the quantity input, clamp its value to [0,10]:
+  if (el.classList.contains('quantity')) {
+    let v = parseInt(el.value, 10) || 1;
+    if (v > 10) v = 10;
+    if (v < 1)  v = 1;
+    el.value = v;
+  }
+
+  // 3) Redraw pages with the (possibly adjusted) values
+  generate();
+      });
     });
   });
 
