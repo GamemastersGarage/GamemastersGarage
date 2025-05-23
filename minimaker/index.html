@@ -163,7 +163,7 @@ const colourOptions = ['Red','Green','Blue','Yellow','Black','White','Brown','Gr
 const sizeOptions   = ['Short wide','Short','Short thin','Medium wide','Medium','Medium thin','Tall wide','Tall','Tall thin'];
 const clothesOptions= ['None','Plate Armour','Leather Armour','Tunic','Robe','Power Armour','Rags','Suit','Finery'];
 const legsOptions   = ['None','Spider','Snake','Centaur'];
-const weaponOptions = ['None','longsword','axe','hammer'];
+const weaponOptions = ['None','Longsword','Axe','Hammer'];
 
 // Default Colour & Size per Body
 const bodyDefaults = {
@@ -182,15 +182,15 @@ const bodyDefaults = {
 
 // Size → width/height multipliers
 const sizeScales = {
-  'Short wide':  {w:1.2, h:0.8},
-  'Short':       {w:1.0, h:0.8},
-  'Short thin':  {w:0.8, h:0.8},
+  'Short wide':  {w:1.0, h:0.8},
+  'Short':       {w:0.8, h:0.8},
+  'Short thin':  {w:0.6, h:0.8},
   'Medium wide': {w:1.2, h:1.0},
   'Medium':      {w:1.0, h:1.0},
   'Medium thin': {w:0.8, h:1.0},
-  'Tall wide':   {w:1.2, h:1.2},
-  'Tall':        {w:1.0, h:1.2},
-  'Tall thin':   {w:0.8, h:1.2},
+  'Tall wide':   {w:1.4, h:1.2},
+  'Tall':        {w:1.2, h:1.2},
+  'Tall thin':   {w:1.0, h:1.2},
 };
 
 // --- UTILITY TO LOAD AN IMAGE ---
@@ -278,7 +278,7 @@ async function generate() {
     const tctx = tmp.getContext('2d');
 
     // 1) Body (tinted)
-    const bodyImg = await loadImage(`images/body/body_${m.body.toLowerCase()}.png`);
+    const bodyImg = await loadImage(`images/body/body_${m.body}.png`);
     if (bodyImg) {
       tctx.drawImage(bodyImg,0,0,w,h);
       tctx.globalCompositeOperation = 'source-in';
@@ -296,14 +296,14 @@ async function generate() {
     // 3) Clothes
     if (m.clothes!=='None') {
       const c = await loadImage(
-        `images/armour/armour_${m.clothes.replace(/ /g,'-').toLowerCase()}.png`
+        `images/armour/armour_${m.clothes}.png`
       );
       if (c) tctx.drawImage(c,0,0,w,h);
     }
 
     // 4) Legs (on top of clothes)
     if (m.legs!=='None') {
-      const lg = await loadImage(`images/leg/leg_${m.legs.toLowerCase()}.png`);
+      const lg = await loadImage(`images/leg/leg_${m.legs}.png`);
       if (lg) tctx.drawImage(lg,0,0,w,h);
     }
 
