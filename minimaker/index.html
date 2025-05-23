@@ -178,7 +178,7 @@
           Changes appear in the preview pane in real time.
         </div>
         <button class="form-button" onclick="addMiniatureInput()">➕ Add Miniature</button>
-        <button class="form-button" onclick="printMiniatures()">🖨️ Print Pages</button>
+        <button class="form-button" onclick="printViaPDF()">🖨️ Print Pages</button>
         <button class="form-button" onclick="saveAsPDF()">💾 Save as PDF</button>
       </div>
     </div>
@@ -411,60 +411,42 @@
       }
       pdf.save('miniatures.pdf');
     }
-function printMiniatures() {
-  const printWin = window.open('', 'PRINT', 'width=800,height=600');
-  const doc = printWin.document;
-
-  // 1) Write a fresh HTML document with clean print CSS
-  doc.open();
-  doc.write(`
-    <html>
-      <head>
-        <title>Print Miniatures</title>
-        <style>
-          @page { size: A4 portrait; margin: 0; }
-          html, body { margin: 0; padding: 0; }
-
-
-          /* no border or padding so it truly fills */
-          .page img {
-            display: block;
-            width: 100%;
-            height: auto;
-          }
-          /* avoid leaving a final blank page */
-          .page:last-child {
-            page-break-after: auto;
-          }
-        </style>
-      </head>
-      <body></body>
-    </html>
-  `);
-  doc.close();
-
-  // 2) Build a list of promises to know when every image is loaded
+function printViaPDF() {
+  const { jsPDF } = window.jspdf;
+  // 1) Build the PDF exactly as you do in saveAsPDF()
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
   const canvases = document.querySelectorAll('#pages canvas');
-  const loadPromises = Array.from(canvases).map((canvas, idx) => {
-    return new Promise(resolve => {
-      const wrapper = doc.createElement('div');
-      wrapper.className = 'page';
-
-      const img = new Image();
-      img.src = canvas.toDataURL('image/png');
-      // when the image is painted at full size, resolve
-      img.onload = () => resolve();
-      wrapper.appendChild(img);
-      doc.body.appendChild(wrapper);
-    });
+  canvases.forEach((canvas, idx) => {
+    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+    if (idx > 0) pdf.addPage();
+    pdf.addImage(
+      imgData,
+      'JPEG',
+      0,
+      0,
+      pdf.internal.pageSize.getWidth(),
+      pdf.internal.pageSize.getHeight()
+    );
   });
 
-  // 3) Once all images are ready, fire print
-  Promise.all(loadPromises).then(() => {
-    printWin.focus();
-    printWin.print();
-    // printWin.close(); // optional
-  });
+  // 2) Embed and auto-print
+  pdf.autoPrint();                                      // instruct PDF to pop its print dialog
+  const blob = pdf.output('blob');                      // get a Blob
+  const url  = URL.createObjectURL(blob);               // turn it into an object URL
+  const iframe = document.createElement('iframe');      // hidden print frame
+  iframe.style.display = 'none';
+  iframe.src = url;
+  document.body.appendChild(iframe);
+
+  iframe.onload = () => {
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+    // cleanup after a short delay
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      document.body.removeChild(iframe);
+    }, 1000);
+  };
 }
   </script>
 </body>
