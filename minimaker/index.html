@@ -177,9 +177,8 @@
           Select or add your miniatures below.<br>
           Changes appear in the preview pane in real time.
         </div>
-        <button class="form-button" onclick="addMiniatureInput()">➕ Add Miniature</button>
-        <button class="form-button" onclick="printViaPDF_Tab()">🖨️ Print Pages</button>
-        <button class="form-button" onclick="saveAsPDF()">💾 Save as PDF</button>
+        <button class="form-button" onclick="addMiniatureInput()">➕ Add Mob</button>
+        <button class="form-button" onclick="printViaPDF_Tab()">🖨️ Export PDF</button>
       </div>
     </div>
           <div id="miniature-inputs"></div>
@@ -400,21 +399,10 @@
       return {canvas, ctx};
     }
 
-    async function saveAsPDF() {
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF({ orientation:'portrait', unit:'pt', format:'a4' });
-      const canvases = document.querySelectorAll('#pages canvas');
-      for (let i=0; i<canvases.length; i++) {
-        const img = canvases[i].toDataURL('image/jpeg',1.0);
-        if (i>0) pdf.addPage();
-        pdf.addImage(img, 'JPEG', 0,0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
-      }
-      pdf.save('miniatures.pdf');
-    }
   function printViaPDF_Tab() {
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
-  const canvases = document.querySelectorAll('#pages canvas');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+    const canvases = document.querySelectorAll('#pages canvas');
 
   canvases.forEach((canvas, idx) => {
     const imgData = canvas.toDataURL('image/jpeg', 1.0);
