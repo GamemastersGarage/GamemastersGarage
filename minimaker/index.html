@@ -438,15 +438,16 @@ function printViaPDF() {
   iframe.src = url;
   document.body.appendChild(iframe);
 
-  iframe.onload = () => {
+iframe.onload = () => {
+  setTimeout(() => {
     iframe.contentWindow.focus();
     iframe.contentWindow.print();
-    // cleanup after a short delay
     setTimeout(() => {
       URL.revokeObjectURL(url);
       document.body.removeChild(iframe);
-    }, 1000);
-  };
+    }, 2000); // cleanup
+  }, 500); // delay before print() – tweak if needed
+};
 }
   </script>
 </body>
