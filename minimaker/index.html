@@ -158,6 +158,23 @@
         border: none !important;
         page-break-after: always !important;
       }
+      /* INPUT ROWS */
+          .input-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .input-row label {
+      flex: 0 0 70px;   /* make all labels the same width */
+      margin-right: 10px;
+      font-weight: bold;
+    }
+
+    .input-row select,
+    .input-row input {
+      flex: 1;          /* let the inputs fill the remaining space */
+    }
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -240,17 +257,17 @@
     function addMiniatureInput() {
       const div = document.createElement('div');
       div.className = 'miniature-input';
-      div.innerHTML = `
-        <div>Qty:    <input type="number" class="quantity" value="1" min="1" max="10"></div>
-        <div>Body:   <select class="body">${bodyOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
-        <div>Colour: <select class="colour">${colourOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
-        <div>Size:   <select class="size">${sizeOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
-        <div>Clothes:<select class="clothes">${clothesOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
-        <div>Legs:   <select class="legs">${legsOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
-        <div>Hand-1: <select class="hand1">${weaponOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
-        <div>Hand-2: <select class="hand2">${weaponOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
-        <div><button onclick="this.parentNode.remove(); generate();">❌ Delete</button></div>
-      `;
+div.innerHTML = `
+  <div class="input-row"><label>Qty:</label>    <input type="number" class="quantity" value="1" min="1" max="10"></div>
+  <div class="input-row"><label>Body:</label>   <select class="body">${bodyOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
+  <div class="input-row"><label>Colour:</label> <select class="colour">${colourOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
+  <div class="input-row"><label>Size:</label>   <select class="size">${sizeOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
+  <div class="input-row"><label>Clothes:</label><select class="clothes">${clothesOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
+  <div class="input-row"><label>Legs:</label>   <select class="legs">${legsOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
+  <div class="input-row"><label>Hand-1:</label> <select class="hand2">${weaponOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
+  <div class="input-row"><label>Hand-2:</label> <select class="hand1">${weaponOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
+  <div class="input-row"><button onclick="this.parentNode.parentNode.remove(); generate();">❌ Delete</button></div>
+`;
       document.getElementById('miniature-inputs').appendChild(div);
       div.querySelectorAll('select, input').forEach(el => {
         el.addEventListener('change', () => {
