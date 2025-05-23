@@ -413,13 +413,22 @@
     }
 function printMiniatures() {
   const printWin = window.open('', 'PRINT', 'width=800,height=600');
+
   printWin.document.write(`
     <html>
       <head>
         <title>Print Miniatures</title>
         <style>
-          body { margin:0; padding:0; }
-          img { display:block; width:100%; page-break-after:always; }
+          @page { margin: 0; size: auto; }
+          html, body { margin: 0; padding: 0; }
+          img {
+            display: block;
+            width: 100%;
+            height: auto;
+          }
+          img + img {
+            page-break-before: always;
+          }
         </style>
       </head>
       <body></body>
@@ -427,7 +436,7 @@ function printMiniatures() {
   `);
   printWin.document.close();
 
-  // Clone each canvas as an <img> into the print window
+  // append each canvas as an <img>
   document.querySelectorAll('#pages canvas').forEach(canvas => {
     const img = new Image();
     img.src = canvas.toDataURL('image/png');
@@ -436,7 +445,7 @@ function printMiniatures() {
 
   printWin.focus();
   printWin.print();
-  printWin.close(); // uncomment if you want to auto-close after printing
+  // printWin.close(); // if you want to auto-close afterwards
 }
   </script>
 </body>
