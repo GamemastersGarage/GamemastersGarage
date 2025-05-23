@@ -99,9 +99,13 @@
       background-color: #333;
     }
     #miniature-inputs {
-      flex: 1;
-      overflow-y: auto;
+      width: 300px;              /* fixed sidebar width—tweak as you like */
+      height: 100vh;             /* span the full viewport height */
+      box-sizing: border-box;    /* include that padding */
+      background-color: #fbf6ef; /* match the controls pane */
+      overflow-y: auto;          /* keep scrolling enabled */
       padding: 10px 20px;
+      border-right: 1px solid #ccc; /* separates it from the preview */
     }
 
     /* PREVIEW */
@@ -177,8 +181,8 @@
         <button class="form-button" onclick="window.print()">🖨️ Print Pages</button>
         <button class="form-button" onclick="saveAsPDF()">💾 Save as PDF</button>
       </div>
-      <div id="miniature-inputs"></div>
     </div>
+          <div id="miniature-inputs"></div>
     <div id="pages"></div>
   </div>
 
