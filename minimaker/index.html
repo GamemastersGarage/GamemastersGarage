@@ -7,19 +7,15 @@
   <title>Gamemaster's Garage</title>
   <link href="https://fonts.googleapis.com/css2?family=League+Spartan&display=swap" rel="stylesheet" />
   <style>
-    /* === GLOBAL & RESET === */
-    body {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
+    html, body {
+      height: 100%;
+      margin: 0;
       font-family: 'League Spartan', sans-serif;
       background-color: #f8f0e3;
       color: #000;
-      margin: 0;
-      padding: 0;
+      overflow: hidden;
+      display: flex;
     }
-
-    /* === NAVIGATION === */
     .menu-toggle {
       position: fixed;
       top: 15px;
@@ -40,15 +36,15 @@
       position: fixed;
       top: 0;
       left: 0;
-      background-color: #fbf6ef;
       width: 200px;
       height: 100vh;
+      background-color: #fbf6ef;
       transform: translateX(-100%);
       transition: transform 0.3s ease;
       box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-      z-index: 1500;
       padding-top: 60px;
       text-align: left;
+      z-index: 1500;
     }
     nav.active {
       transform: translateX(0);
@@ -65,82 +61,85 @@
       text-decoration: none;
       font-size: 18px;
     }
-
-    /* === HEADER === */
-    header {
-      padding: 60px 20px 40px;
-      flex: 0 0 auto;
-    }
-    header img {
-      max-width: 150px;
-    }
-    h1 {
-      font-size: 2em;
-      margin: 20px 0;
-    }
-
-    /* === NEW SIDE-BY-SIDE LAYOUT === */
     #main {
       display: flex;
-      flex: 1;              /* fill remaining vertical space */
+      flex: 1;
+      margin-left: 200px;
       overflow: hidden;
     }
     #controls {
       width: 350px;
       background-color: #fbf6ef;
       border-right: 1px solid #ccc;
-      padding: 20px;
-      overflow-y: auto;
-      text-align: left;
+      display: flex;
+      flex-direction: column;
     }
-    #pages {
-      flex: 1;
+    #control-box {
+      flex: 0 0 auto;
       padding: 20px;
-      overflow-y: auto;
-      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
-    /* center canvases in the pages pane */
-    #pages canvas {
-      margin: 20px auto;
+    #control-box img {
+      width: 100px;
       display: block;
+      margin-bottom: 10px;
     }
-
-    /* === BUTTONS & FORM ELEMENTS === */
-    .form-button {
+    #control-box .instructions {
+      font-size: 14px;
+      margin-bottom: 15px;
+      line-height: 1.4;
+    }
+    #control-box .form-button {
       display: block;
       width: 100%;
-      padding: 12px 0;
-      margin-bottom: 10px;
-      font-size: 18px;
-      font-family: 'League Spartan', sans-serif;
+      padding: 10px 0;
+      margin-bottom: 8px;
+      font-size: 16px;
       background-color: #000;
       color: #fff;
       border: none;
-      cursor: pointer;
       border-radius: 4px;
+      cursor: pointer;
       transition: background-color 0.3s ease;
     }
-    .form-button:hover {
+    #control-box .form-button:hover {
       background-color: #333;
     }
-
-    /* === ORIGINAL APP STYLES === */
-    .controls { margin-bottom: 20px; }
-    canvas { border: 1px solid #333; }
-    .miniature-input { 
-      margin-bottom: 10px; 
-      padding: 10px; 
-      border: 1px solid #ccc; 
-      background-color: #fff; 
-      display: inline-block; 
-      text-align: left; 
+    #miniature-inputs {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 20px;
+    }
+    #pages {
+      flex: 1;
+      overflow-y: auto;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    #pages canvas {
+      max-height: 100%;
+      width: auto;
+      margin: 10px 0;
+      border: 1px solid #333;
+    }
+    .miniature-input {
+      margin-bottom: 12px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      text-align: left;
       width: 100%;
     }
-    .miniature-input select, 
-    .miniature-input input { margin-right: 10px; }
-    .miniature-input button { margin-top: 10px; }
-    button { margin-right: 10px; margin-top: 10px; }
-
+    .miniature-input select,
+    .miniature-input input {
+      margin-right: 8px;
+    }
+    .miniature-input button {
+      margin-top: 8px;
+    }
     @media print {
       body * { visibility: hidden; }
       #pages canvas {
@@ -150,9 +149,9 @@
         height: 297mm;
         border: none !important;
         page-break-after: always;
-      } 
+      }
       #pages canvas:last-child {
-        page-break-after: auto !important;  
+        page-break-after: auto !important;
       }
       @page { size: A4 portrait; margin: 0; }
     }
@@ -162,9 +161,7 @@
 <body>
 
   <div class="menu-toggle" onclick="document.querySelector('nav').classList.toggle('active')">
-    <span></span>
-    <span></span>
-    <span></span>
+    <span></span><span></span><span></span>
   </div>
 
   <nav>
@@ -176,25 +173,26 @@
     </ul>
   </nav>
 
-  <header>
-    <picture>
-      <source srcset="../GamemastersGarage_Logo_WEBP_512x.webp" type="image/webp">
-      <img src="../GamemastersGarage_Logo_PNG_512x.png" alt="Gamemaster's Garage Logo" width="150" />
-    </picture>
-    <h1>Paper Miniatures Generator</h1>
-  </header>
-
   <div id="main">
     <div id="controls">
-      <button class="form-button" onclick="addMiniatureInput()">➕ Add Miniature</button>
-      <button class="form-button" onclick="window.print()">🖨️ Print Pages</button>
-      <button class="form-button" onclick="saveAsPDF()">💾 Save as PDF</button>
+      <div id="control-box">
+        <picture>
+          <source srcset="../GamemastersGarage_Logo_WEBP_512x.webp" type="image/webp">
+          <img src="../GamemastersGarage_Logo_PNG_512x.png" alt="Logo">
+        </picture>
+        <div class="instructions">
+          Select or add your miniatures below. Changes appear in the preview pane at right in real time.
+        </div>
+        <button class="form-button" onclick="addMiniatureInput()">➕ Add Miniature</button>
+        <button class="form-button" onclick="window.print()">🖨️ Print Pages</button>
+        <button class="form-button" onclick="saveAsPDF()">💾 Save as PDF</button>
+      </div>
+      <div id="miniature-inputs"></div>
     </div>
     <div id="pages"></div>
   </div>
 
   <script>
-    // --- OPTION DEFINITIONS ---
     const bodyOptions   = ['Dwarf','Orc','Ogre','Human','Skeleton','Elf','Bug','Robot','Cat','Lizard','Devil'];
     const colourOptions = ['Red','Green','Blue','Yellow','Black','White','Brown','Gray','Orange','Purple','Pink','Silver','Peach','PaleGreen'];
     const sizeOptions   = ['Short wide','Short','Short thin','Medium wide','Medium','Medium thin','Tall wide','Tall','Tall thin'];
@@ -228,7 +226,6 @@
       'Tall thin':   {w:1.0, h:1.2},
     };
 
-    // --- UTILITY TO LOAD AN IMAGE ---
     function loadImage(src) {
       return new Promise(resolve => {
         const img = new Image();
@@ -238,7 +235,6 @@
       });
     }
 
-    // --- ADD ONE MINIATURE CONTROLS ROW ---
     function addMiniatureInput() {
       const div = document.createElement('div');
       div.className = 'miniature-input';
@@ -253,15 +249,14 @@
         Qty:    <input type="number" class="quantity" value="1" min="1" max="10">
         <button onclick="this.parentNode.remove(); generate();">❌ Delete</button>
       `;
-      document.getElementById('controls').appendChild(div);
+      document.getElementById('miniature-inputs').appendChild(div);
 
       div.querySelectorAll('select, input').forEach(el => {
         el.addEventListener('change', () => {
           if (el.classList.contains('body')) applyDefaults(div);
           if (el.classList.contains('quantity')) {
-            let v = parseInt(el.value, 10) || 1;
-            if (v > 10) v = 10;
-            if (v < 1)  v = 1;
+            let v = parseInt(el.value, 10)||1;
+            if (v>10) v=10; if (v<1) v=1;
             el.value = v;
           }
           generate();
@@ -273,20 +268,17 @@
     }
 
     function applyDefaults(div) {
-      const b = div.querySelector('.body').value;
-      const def = bodyDefaults[b];
+      const def = bodyDefaults[div.querySelector('.body').value];
       div.querySelector('.colour').value = def.colour;
       div.querySelector('.size').value   = def.size;
     }
 
-    // --- MAIN GENERATION ROUTINE ---
     async function generate() {
       const pagesDiv = document.getElementById('pages');
       pagesDiv.innerHTML = '';
       const tabH = 140, margin = 118 + tabH,
             pageW = 2480, pageH = 3508,
             baseW = 400, baseH = 512;
-
       const miniatures = [];
       document.querySelectorAll('.miniature-input').forEach(div => {
         const body   = div.querySelector('.body').value;
@@ -296,7 +288,7 @@
         const legs   = div.querySelector('.legs').value;
         const hand1  = div.querySelector('.hand1').value;
         const hand2  = div.querySelector('.hand2').value;
-        const qty    = parseInt(div.querySelector('.quantity').value) || 1;
+        const qty    = parseInt(div.querySelector('.quantity').value)||1;
         for (let i=0; i<qty; i++) miniatures.push({body,colour,size,clothes,legs,hand1,hand2});
       });
 
@@ -305,8 +297,7 @@
 
       for (const m of miniatures) {
         const scale = sizeScales[m.size] || {w:1,h:1};
-        const w = baseW * scale.w, h = baseH * scale.h;
-
+        const w = baseW*scale.w, h = baseH*scale.h;
         const tmp = document.createElement('canvas');
         tmp.width = w; tmp.height = h;
         const tctx = tmp.getContext('2d');
@@ -314,17 +305,17 @@
         const bodyImg = await loadImage(`images/body/body_${m.body}.png`);
         if (bodyImg) {
           tctx.fillStyle = m.colour;
-          tctx.fillRect(0, 0, w, h);
+          tctx.fillRect(0,0,w,h);
           tctx.globalCompositeOperation = 'destination-in';
-          tctx.drawImage(bodyImg, 0, 0, w, h);
+          tctx.drawImage(bodyImg,0,0,w,h);
           tctx.globalCompositeOperation = 'multiply';
-          tctx.drawImage(bodyImg, 0, 0, w, h);
+          tctx.drawImage(bodyImg,0,0,w,h);
           tctx.globalCompositeOperation = 'source-over';
         }
 
         if (m.hand1!=='None') {
           const h1 = await loadImage(`images/weapon/weapon_${m.hand1}.png`);
-          if (h1) tctx.drawImage(h1, w*0.05, h*0.05, w, h);
+          if (h1) tctx.drawImage(h1,w*0.05,h*0.05,w,h);
         }
         if (m.clothes!=='None') {
           const c = await loadImage(`images/clothes/clothes_${m.clothes}.png`);
@@ -399,7 +390,8 @@
 
     function createNewPage(pageNum) {
       const canvas = document.createElement('canvas');
-      canvas.width = 2480; canvas.height = 3508;
+      canvas.width = 2480;
+      canvas.height = 3508;
       canvas.style.pageBreakAfter = "always";
       document.getElementById('pages').appendChild(canvas);
       const ctx = canvas.getContext('2d');
