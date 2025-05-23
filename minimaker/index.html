@@ -158,23 +158,26 @@
         border: none !important;
         page-break-after: always !important;
       }
-      /* INPUT ROWS */
-          .input-row {
-      display: flex;
-      align-items: center;
-      margin-bottom: 8px;
-    }
+/* ── form flex rows ── */
+.input-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
 
-    .input-row label {
-      flex: 0 0 70px;   /* make all labels the same width */
-      margin-right: 10px;
-      font-weight: bold;
-    }
+.input-row label {
+  flex: 0 0 80px;       /* fixed label width—tweak to suit */
+  text-align: left;     /* left-align the text */
+  margin-right: 10px;   /* space before the dropdown */
+  font-weight: bold;
+}
 
-    .input-row select,
-    .input-row input {
-      flex: 1;          /* let the inputs fill the remaining space */
-    }
+.input-row select,
+.input-row input {
+  flex: 1;              /* fill the remaining space */
+  margin-right: 0;      /* override any old margins */
+}
+
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -254,21 +257,63 @@
       });
     }
 
-    function addMiniatureInput() {
-      const div = document.createElement('div');
-      div.className = 'miniature-input';
-div.innerHTML = `
-  <div class="input-row"><label>Qty:</label>    <input type="number" class="quantity" value="1" min="1" max="10"></div>
-  <div class="input-row"><label>Body:</label>   <select class="body">${bodyOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
-  <div class="input-row"><label>Colour:</label> <select class="colour">${colourOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
-  <div class="input-row"><label>Size:</label>   <select class="size">${sizeOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
-  <div class="input-row"><label>Clothes:</label><select class="clothes">${clothesOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
-  <div class="input-row"><label>Legs:</label>   <select class="legs">${legsOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
-  <div class="input-row"><label>Hand-1:</label> <select class="hand2">${weaponOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
-  <div class="input-row"><label>Hand-2:</label> <select class="hand1">${weaponOptions.map(o=>`<option>${o}</option>`).join('')}</select></div>
-  <div class="input-row"><button onclick="this.parentNode.parentNode.remove(); generate();">❌ Delete</button></div>
-`;
-      document.getElementById('miniature-inputs').appendChild(div);
+function addMiniatureInput() {
+  const div = document.createElement('div');
+  div.className = 'miniature-input';
+  div.innerHTML = `
+    <div class="input-row">
+      <label for="body">Body:</label>
+      <select id="body" class="body">
+        ${bodyOptions.map(o=>`<option>${o}</option>`).join('')}
+      </select>
+    </div>
+    <div class="input-row">
+      <label for="colour">Colour:</label>
+      <select id="colour" class="colour">
+        ${colourOptions.map(o=>`<option>${o}</option>`).join('')}
+      </select>
+    </div>
+    <div class="input-row">
+      <label for="size">Size:</label>
+      <select id="size" class="size">
+        ${sizeOptions.map(o=>`<option>${o}</option>`).join('')}
+      </select>
+    </div>
+    <div class="input-row">
+      <label for="clothes">Clothes:</label>
+      <select id="clothes" class="clothes">
+        ${clothesOptions.map(o=>`<option>${o}</option>`).join('')}
+      </select>
+    </div>
+    <div class="input-row">
+      <label for="legs">Legs:</label>
+      <select id="legs" class="legs">
+        ${legsOptions.map(o=>`<option>${o}</option>`).join('')}
+      </select>
+    </div>
+    <div class="input-row">
+      <label for="hand1">Hand-1:</label>
+      <select id="hand1" class="hand1">
+        ${weaponOptions.map(o=>`<option>${o}</option>`).join('')}
+      </select>
+    </div>
+    <div class="input-row">
+      <label for="hand2">Hand-2:</label>
+      <select id="hand2" class="hand2">
+        ${weaponOptions.map(o=>`<option>${o}</option>`).join('')}
+      </select>
+    </div>
+    <div class="input-row">
+      <label for="quantity">Qty:</label>
+      <input id="quantity" type="number" class="quantity" value="1" min="1" max="10">
+    </div>
+    <div class="input-row">
+      <button onclick="this.closest('.miniature-input').remove(); generate();">
+        ❌ Delete
+      </button>
+    </div>
+  `;
+  document.getElementById('miniature-inputs').appendChild(div);
       div.querySelectorAll('select, input').forEach(el => {
         el.addEventListener('change', () => {
           if (el.classList.contains('body')) applyDefaults(div);
