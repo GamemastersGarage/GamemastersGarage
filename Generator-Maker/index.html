@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="GamemastersGarage_Logo_Favicon_V01_48x48.svg" type="image/png">
+  <title>Gamemaster's Garage – Table Generator Builder</title>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan&display=swap" rel="stylesheet" />
+  <style>
+    /* ────────────────────────────────────────────────────────────────────────────
+       Your existing site styles
+       ──────────────────────────────────────────────────────────────────────────── */
+    body {
+      font-family: 'League Spartan', sans-serif;
+      background-color: #f8f0e3;
+      color: #000;
+      margin: 0; padding: 0;
+      text-align: center;
+    }
+    .menu-toggle { position: fixed; top: 15px; left: 15px; width: 30px; height: 25px; cursor: pointer; z-index: 2000; }
+    .menu-toggle span { display: block; height: 4px; background: #000; margin: 5px 0; transition: 0.3s; }
+    nav {
+      position: fixed; top: 0; left: 0;
+      background-color: #fbf6ef;
+      width: 200px; height: 100vh;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+      z-index: 1500; padding-top: 60px; text-align: left;
+    }
+    nav.active { transform: translateX(0); }
+    nav ul { list-style: none; padding: 0 20px; }
+    nav li { margin: 20px 0; }
+    nav a { color: #000; text-decoration: none; font-size: 18px; }
+    header {
+      padding: 60px 20px 40px; /* space for burger */
+    }
+    header img { max-width: 150px; }
+    h1 { font-size: 2em; margin: 20px 0; }
+    .signup { margin: 20px 0; }
+    .form-button {
+      padding: 12px 24px;
+      font-size: 18px;
+      background-color: #000; color: #fff;
+      border: none; cursor: pointer; border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+    .form-button:hover { background-color: #333; }
+    .modal {
+      display: none; position: fixed; z-index: 1000;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background-color: rgba(0, 0, 0, 0.6);
+    }
+    .modal-content {
+      background-color: #f8f0e3; margin: auto;
+      padding: 20px; border: 1px solid #888;
+      width: 90%; max-width: 700px;
+      border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .close-button {
+      color: #000; position: absolute;
+      top: 10px; right: 10px; font-size: 28px;
+      font-weight: bold; cursor: pointer; z-index: 9999;
+      background-color: #f8f0e3; padding: 4px 10px;
+      border-radius: 4px;
+    }
+    .contact-email {
+      font-size: 14px; margin-top: 10px; color: #333;
+    }
+    .contact-email a {
+      color: #000; text-decoration: underline;
+    }
+
+    /* ────────────────────────────────────────────────────────────────────────────
+       Builder tool styles
+       ──────────────────────────────────────────────────────────────────────────── */
+    #builder {
+      text-align: left;
+      max-width: 800px;
+      margin: 2em auto;
+      padding: 0 1em;
+    }
+    #builder h2 {
+      font-size: 1.6em;
+      margin-bottom: 0.5em;
+    }
+    #builder .instructions {
+      color: #555;
+      margin-bottom: 1em;
+      font-size: 1em;
+      line-height: 1.4;
+    }
+    #builder #metadata {
+      margin-bottom: 1em;
+    }
+    #builder #metadata label {
+      display: block;
+      margin-bottom: 0.75em;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+    #builder #metadata input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.5em;
+      font-size: 1.1em;
+      margin-top: 0.2em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #builder #controls button {
+      margin-right: 0.5em;
+      margin-bottom: 1em;
+      font-size: 1.1em;
+      padding: 0.6em 1em;
+      background-color: #fbf6ef;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #builder #controls button:hover {
+      background-color: #f2e9d9;
+    }
+    #builder #sections {
+      margin-bottom: 2em;
+    }
+    #builder .section {
+      position: relative;
+      border: 1px solid #ccc;
+      background: #fff;
+      padding: 0.75em;
+      margin-bottom: 0.5em;
+      border-radius: 4px;
+    }
+    #builder .toggle-type {
+      display: inline-block;
+      margin-bottom: 0.5em;
+      background-color: #fbf6ef;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 0.4em;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    #builder .toggle-type:hover {
+      background-color: #f2e9d9;
+    }
+    #builder .reorder-buttons {
+      position: absolute;
+      right: 0.5em;
+      top: 0.5em;
+      display: flex;
+      flex-direction: column;
+    }
+    #builder .reorder-buttons button {
+      padding: 0;
+      width: 1.5em;
+      line-height: 1;
+      margin-bottom: 0.2em;
+      background-color: #fbf6ef;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    #builder .reorder-buttons button:hover:not(:disabled) {
+      background-color: #f2e9d9;
+    }
+    #builder .section input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.5em;
+      font-size: 1.05em;
+      margin-bottom: 0.5em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    /* note: we no longer hide these via CSS; JS will toggle */
+    #builder #preview {
+      padding: 1em;
+      border: 2px solid #444;
+      background: #fafafa;
+      margin-bottom: 1em;
+      border-radius: 4px;
+    }
+    #builder #preview p {
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-bottom: 0.5em;
+    }
+    #builder #preview button {
+      font-size: 1.1em;
+      padding: 0.6em 1em;
+      background-color: #fbf6ef;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #builder #preview button:hover {
+      background-color: #f2e9d9;
+    }
+    /* full-width add-section row */
+    #builder .section.add-section {
+      text-align: center;
+    }
+    #builder .section.add-section button {
+      width: 100%;
+      font-size: 1.1em;
+      padding: 0.6em 1em;
+      background-color: #fbf6ef;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #builder .section.add-section button:hover {
+      background-color: #f2e9d9;
+    }
+    /* embed snippet */
+    #builder #embed {
+      margin-top: 1em;
+    }
+    #builder #embed h2 {
+      font-size: 1.3em;
+      margin-bottom: 0.5em;
+    }
+    #builder #embed textarea {
+      width: 100%;
+      box-sizing: border-box;
+      font-family: monospace;
+      font-size: 0.95em;
+      padding: 0.5em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: #f2f2f2;
+      resize: vertical;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Burger Toggle -->
+  <div class="menu-toggle" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+
+  <!-- Navigation Menu -->
+  <nav id="mainMenu">
+    <ul>
+      <li><a href="../">Manuals</a></li>
+      <li><a href="/tools/">Tools</a></li>
+      <li><a href="/mini-layout-generator/">Paper Minis Tool</a></li>
+      <li><a href="https://buymeacoffee.com/gamemastersgarage" target="_blank" rel="noopener noreferrer">Buy me a coffee</a></li>
+    </ul>
+  </nav>
+
+  <!-- Header -->
+  <header>
+    <picture>
+      <source srcset="GamemastersGarage_Logo_WEBP_512x.webp" type="image/webp">
+      <img src="GamemastersGarage_Logo_PNG_512x.png" alt="Gamemaster's Garage Logo" width="150">
+    </picture>
+    <h1>Makers of quality TTRPG tools</h1>
+    <div class="signup">
+      <button id="openForm" class="form-button">Join Our Mailing List</button>
+      <p class="contact-email">or reach out: <a href="mailto:info@gamemastersgarage.com">info@gamemastersgarage.com</a></p>
+    </div>
+  </header>
+
+  <!-- Mailing List Modal -->
+  <div id="formModal" class="modal">
+    <div class="modal-content">
+      <span class="close-button">&times;</span>
+      <iframe 
+        src="https://docs.google.com/forms/d/e/1FAIpQLSdd-jowcMCdLik7Jeb4FmZV7jLdJdemap4uP8gImlh6kBYX6A/viewform?usp=header" 
+        frameborder="0" 
+        style="width:100%; height:500px; border:none;">
+        Loading…
+      </iframe>
+    </div>
+  </div>
+
+  <!-- Builder tool UI -->
+  <div id="builder">
+    <h2>The Generator-O-Matic</h2>
+    <p class="instructions">
+	This tool allows you to create your own generators for hosting on your websites, or for personal use.<br><br>
+      1. Click “Add section +” below to insert a new part of the final text.<br> 
+      2. Toggle between static (🔒) for unchanging text, and variable (🎲) to enter a comma-deliniated list from which options will be selected when the generator is rolled.<br> 
+      3. Reorder sections with the ▲/▼ arrows on the right.<br> 
+      4. Once you’ve written something, a preview of the generator and a html snippet for embedding into an existing web page will appear at the bottom of this page.<br>
+	5. The "Save Generator" button exports the generator as a complete html webpage.<br><br>
+Usage note: You can use generators made with this tool however you like, as long as you leave the "Made at gamemastersgarage.com" visible.
+    </p>
+    <div id="metadata">
+      <label>
+        Title<br>
+        <input type="text" id="titleInput" placeholder="Generator title">
+      </label>
+      <label>
+        Author/Credit<br>
+        <input type="text" id="authorInput" placeholder="Your name">
+      </label>
+    </div>
+    <div id="controls">
+      <button id="newGenBtn">New generator</button>
+      <button id="saveGenBtn">Save generator</button>
+    </div>
+    <div id="sections"></div>
+    <div id="preview">
+      <h2>Result</h2>
+      <p id="result">[nothing yet]</p>
+      <button id="rerollBtn">Reroll</button>
+	<div style="font-size:0.8em;color:#888;margin-top:1em;">
+	Made at gamemastersgarage.com
+	</div>
+    </div>
+    <div id="embed">
+      <h2>Embed Snippet</h2>
+      <textarea id="embedCode" rows="10" readonly></textarea>
+    </div>
+  </div>
+
+  <script>
+    // burger menu + modal
+    function toggleMenu() {
+      document.getElementById('mainMenu').classList.toggle('active');
+    }
+    document.getElementById('openForm').addEventListener('click', () => {
+      document.getElementById('formModal').style.display = 'block';
+    });
+    document.querySelector('.close-button').addEventListener('click', () => {
+      document.getElementById('formModal').style.display = 'none';
+    });
+    window.addEventListener('click', e => {
+      if (e.target.id === 'formModal') {
+        document.getElementById('formModal').style.display = 'none';
+      }
+    });
+
+    // core builder logic
+    let sections = [];
+
+    function choice(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function generate() {
+      return sections
+        .map(sec => {
+          if (sec.type === 'static') return sec.text;
+          const opts = sec.text.split(',').map(s => s.trim()).filter(Boolean);
+          return opts.length ? choice(opts) : '';
+        })
+        .join(' ');
+    }
+
+    function updateVisibility() {
+      const hasContent = sections.some(sec => sec.text.trim().length > 0);
+      document.getElementById('saveGenBtn').style.display = hasContent ? '' : 'none';
+      document.getElementById('preview').style.display    = hasContent ? '' : 'none';
+      document.getElementById('embed').style.display      = hasContent ? '' : 'none';
+    }
+
+    function updatePreview() {
+      const out = generate();
+      document.getElementById('result').textContent = out || '[nothing yet]';
+      updateEmbedSnippet();
+      updateVisibility();
+    }
+
+    function renderSections() {
+      const container = document.getElementById('sections');
+      container.innerHTML = '';
+
+      sections.forEach((sec, idx) => {
+        const div = document.createElement('div');
+        div.className = 'section';
+
+        // type toggle
+        const toggle = document.createElement('button');
+        toggle.className = 'toggle-type';
+        toggle.textContent = sec.type === 'static' ? '🔒 Static' : '🎲 Variable';
+        toggle.onclick = () => {
+          sec.type = sec.type === 'static' ? 'variable' : 'static';
+          renderSections();
+        };
+        div.appendChild(toggle);
+
+        // reorder ▲ ▼
+        const reorder = document.createElement('div');
+        reorder.className = 'reorder-buttons';
+        const up = document.createElement('button');
+        up.textContent = '▲'; up.disabled = idx === 0;
+        up.onclick = () => {
+          [sections[idx-1], sections[idx]] = [sections[idx], sections[idx-1]];
+          renderSections();
+        };
+        const down = document.createElement('button');
+        down.textContent = '▼'; down.disabled = idx === sections.length - 1;
+        down.onclick = () => {
+          [sections[idx], sections[idx+1]] = [sections[idx+1], sections[idx]];
+          renderSections();
+        };
+        reorder.append(up, down);
+        div.appendChild(reorder);
+
+        // text input
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.value = sec.text;
+        inp.placeholder = sec.type === 'static'
+          ? 'Enter fixed text'
+          : 'e.g. dragon, goblin, orc';
+        inp.oninput = e => {
+          sec.text = e.target.value;
+          updatePreview();
+        };
+        div.appendChild(inp);
+
+        // remove
+        const rm = document.createElement('button');
+        rm.textContent = 'Remove';
+        rm.onclick = () => {
+          sections.splice(idx, 1);
+          renderSections();
+        };
+        div.appendChild(rm);
+
+        container.appendChild(div);
+      });
+
+      // "Add section +" row at the end
+      const addDiv = document.createElement('div');
+      addDiv.className = 'section add-section';
+      const addBtn = document.createElement('button');
+      addBtn.textContent = 'Add section +';
+      addBtn.onclick = () => {
+        sections.push({ type: 'static', text: '' });
+        renderSections();
+      };
+      addDiv.appendChild(addBtn);
+      container.appendChild(addDiv);
+
+      updatePreview();
+    }
+
+    function updateEmbedSnippet() {
+      const genTitle  = document.getElementById('titleInput').value.trim();
+      const genAuthor = document.getElementById('authorInput').value.trim();
+      const titleTag  = genTitle  ? `<h1>${genTitle}</h1>\n` : '';
+      const authorTag = genAuthor ? `<h3>by ${genAuthor}</h3>\n` : '';
+      const sj        = JSON.stringify(sections);
+      const snippet = `<div id="gm-generator">\n${titleTag}${authorTag}<p id="result"></p>\n<button id="rerollBtn">Reroll</button>\n    
+<div style="font-size:0.8em;color:#888;margin-top:1em;">
+Made at gamemastersgarage.com
+</div>
+\n</div>\n<script>\n(function(){\n  const sections = ${sj};\n  function choice(arr){return arr[Math.floor(Math.random()*arr.length)];}\n  function generate(){return sections.map(sec=>sec.type==='static'?sec.text:choice(sec.text.split(',').map(s=>s.trim()).filter(Boolean))).join(' ');}\n  function update(){document.getElementById('result').textContent=generate();}\n  document.getElementById('rerollBtn').addEventListener('click',update);\n  document.addEventListener('DOMContentLoaded',update);\n})();\n<\/script>`;
+      document.getElementById('embedCode').value = snippet;
+    }
+
+    // controls
+    document.getElementById('newGenBtn').onclick = () => {
+      if (!confirm('Start a new, empty generator?')) return;
+      sections = [];
+      renderSections();
+    };
+    document.getElementById('rerollBtn').onclick = updatePreview;
+    document.getElementById('titleInput').addEventListener('input', updatePreview);
+    document.getElementById('authorInput').addEventListener('input', updatePreview);
+    document.getElementById('saveGenBtn').onclick = () => {
+      // reuse the snippet-download logic already in place
+      // by manually dispatching click
+      // (or you can duplicate the code here if you prefer)
+      document.getElementById('saveGenBtn').dispatchEvent(new MouseEvent('click'));
+    };
+
+    // kick it off
+    renderSections();
+  </script>
+
+</body>
+</html>
