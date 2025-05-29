@@ -382,7 +382,7 @@ function addMiniatureInput() {
 
         if (m.hand1!=='None') {
           const h1 = await loadImage(`images/weapon/weapon_${m.hand1}.png`);
-          if (h1) tctx.drawImage(h1, -145, -13, w, h);
+          if (h1) tctx.drawImage(h1, 0, 0, w, h);
         }
         if (m.clothes!=='None') {
           const c = await loadImage(`images/clothes/clothes_${m.clothes}.png`);
