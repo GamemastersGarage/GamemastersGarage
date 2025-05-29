@@ -223,6 +223,23 @@
     const clothesOptions= ['None','Plate Armour','Leather Armour','Tunic','Robe','Power Armour','Rags','Suit','Finery'];
     const legsOptions   = ['None','Spider','Snake','Centaur'];
     const weaponOptions = ['None','Sword','Axe','Hammer'];
+    
+    const colourMap = {
+  Red:        '#ff0000',
+  Green:      '#008000',
+  Blue:       '#0000ff',
+  Yellow:     '#ffff00',
+  Black:      '#000000',
+  White:      '#ffffff',
+  Brown:      '#8b4513',
+  Gray:       '#808080',
+  Orange:     '#ffa500',
+  Purple:     '#800080',
+  Pink:       '#ffc0cb',
+  Silver:     '#c0c0c0',
+  Peach:      '#ffe5b4',
+  PaleGreen:  '#98fb98'
+};
 
     const bodyDefaults = {
       Dwarf:   { colour:'Brown',    size:'Short'       },
@@ -415,7 +432,7 @@ function duplicateMiniature(button) {
 
         const bodyImg = await loadImage(`images/body/body_${m.body}.png`);
         if (bodyImg) {
-          tctx.fillStyle = m.colour;
+          tctx.fillStyle = colourMap[m.colour] || '#000000';
           tctx.fillRect(0,0,w,h);
           tctx.globalCompositeOperation = 'destination-in';
           tctx.drawImage(bodyImg,0,0,w,h);
