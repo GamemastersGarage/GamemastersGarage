@@ -398,19 +398,6 @@ function duplicateMiniature(button) {
   original.after(clone);
   generate();
 }
-
-function duplicateMiniature(button) {
-  const original = button.closest('.miniature-input');
-  const clone = original.cloneNode(true);
-
-  // Copy each input/select value from original to clone
-  const originalInputs = original.querySelectorAll('select, input');
-  const cloneInputs = clone.querySelectorAll('select, input');
-
-  originalInputs.forEach((input, index) => {
-    if (input.tagName === 'SELECT' || input.tagName === 'INPUT') {
-      cloneInputs[index].value = input.value;
-    }
     function moveMiniature(button, direction) {
   const current = button.closest('.miniature-input');
   const container = document.getElementById('miniature-inputs');
@@ -419,14 +406,13 @@ function duplicateMiniature(button) {
 
   const targetIndex = index + direction;
 
-  // Guard: don't move out of bounds
+  // Don’t go out of bounds
   if (targetIndex < 0 || targetIndex >= siblings.length) return;
 
   const referenceNode = siblings[targetIndex + (direction > 0 ? 1 : 0)];
   container.insertBefore(current, referenceNode);
   generate();
 }
-  });
 
     async function generate() {
       const pagesDiv = document.getElementById('pages');
