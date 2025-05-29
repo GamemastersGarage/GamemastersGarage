@@ -379,10 +379,9 @@ function addMiniatureInput() {
           tctx.drawImage(bodyImg,0,0,w,h);
           tctx.globalCompositeOperation = 'source-over';
         }
-
-        if (m.hand1!=='None') {
-          const h1 = await loadImage(`images/weapon/weapon_${m.hand1}.png`);
-          if (h1) tctx.drawImage(h1, 0, 0, w, h);
+        if (m.hand2!=='None') {
+          const h2 = await loadImage(`images/weapon/weapon_${m.hand2}.png`);
+          if (h2) tctx.drawImage(h2, w * -0.395, h * -0.0254, w, h);
         }
         if (m.clothes!=='None') {
           const c = await loadImage(`images/clothes/clothes_${m.clothes}.png`);
@@ -391,10 +390,10 @@ function addMiniatureInput() {
         if (m.legs!=='None') {
           const lg = await loadImage(`images/legs/legs_${m.legs}.png`);
           if (lg) tctx.drawImage(lg,0,0,w,h);
-        }
-        if (m.hand2!=='None') {
-          const h2 = await loadImage(`images/weapon/weapon_${m.hand2}.png`);
-          if (h2) tctx.drawImage(h2, w * -0.395, h * -0.0254, w, h);
+        }        
+        if (m.hand1!=='None') {
+          const h1 = await loadImage(`images/weapon/weapon_${m.hand1}.png`);
+          if (h1) tctx.drawImage(h1, 0, 0, w, h);
         }
 
         if (x + w > pageW - margin) {
