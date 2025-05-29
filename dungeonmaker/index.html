@@ -382,7 +382,8 @@ function updateSliders() {
 }
 document.getElementById('size').onchange = function() { refreshConfigFromUI(true); };
 document.getElementById('density').onchange = function() { refreshConfigFromUI(true); };
-document.getElementById('regen').onclick = function() { generateDungeon(); draw(); };
+document.getElementById('regen').onclick = function() { refreshConfigFromUI(true);};
+
 document.getElementById('export-pdf').onclick = function() {
   // Full grid, scaled to fill height of A4
  const exportHeight = Math.round(8.27 * 300);
