@@ -336,16 +336,26 @@ function addMiniatureInput() {
       div.querySelector('.colour').value = def.colour;
       div.querySelector('.size').value   = def.size;
     }
-  function duplicateMiniature(button) {
+function duplicateMiniature(button) {
   const original = button.closest('.miniature-input');
   const clone = original.cloneNode(true);
+
+  // Copy each input/select value from original to clone
+  const originalInputs = original.querySelectorAll('select, input');
+  const cloneInputs = clone.querySelectorAll('select, input');
+
+  originalInputs.forEach((input, index) => {
+    if (input.tagName === 'SELECT' || input.tagName === 'INPUT') {
+      cloneInputs[index].value = input.value;
+    }
+  });
 
   // Attach event listeners to cloned inputs
   clone.querySelectorAll('select, input').forEach(el => {
     el.addEventListener('change', () => {
       if (el.classList.contains('body')) applyDefaults(clone);
       if (el.classList.contains('quantity')) {
-        let v = parseInt(el.value, 10)||1;
+        let v = parseInt(el.value, 10) || 1;
         if (v > 10) v = 10;
         if (v < 1) v = 1;
         el.value = v;
@@ -354,7 +364,7 @@ function addMiniatureInput() {
     });
   });
 
-  // Reattach duplicate/delete buttons' logic
+  // Reattach proper button actions
   clone.querySelectorAll('button').forEach(btn => {
     if (btn.textContent.includes('Duplicate')) {
       btn.onclick = function () { duplicateMiniature(btn); };
@@ -369,6 +379,7 @@ function addMiniatureInput() {
   original.after(clone);
   generate();
 }
+
 
     async function generate() {
       const pagesDiv = document.getElementById('pages');
