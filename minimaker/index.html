@@ -310,6 +310,7 @@ function addMiniatureInput() {
       <input id="quantity" type="number" class="quantity" value="1" min="1" max="20">
     </div>
     <div class="input-row">
+      <button onclick="duplicateMiniature(this)">📄 Duplicate</button>
       <button onclick="this.closest('.miniature-input').remove(); generate();">
         ❌ Delete
       </button>
@@ -330,12 +331,44 @@ function addMiniatureInput() {
       applyDefaults(div);
       generate();
     }
-
     function applyDefaults(div) {
       const def = bodyDefaults[div.querySelector('.body').value];
       div.querySelector('.colour').value = def.colour;
       div.querySelector('.size').value   = def.size;
     }
+  function duplicateMiniature(button) {
+  const original = button.closest('.miniature-input');
+  const clone = original.cloneNode(true);
+
+  // Attach event listeners to cloned inputs
+  clone.querySelectorAll('select, input').forEach(el => {
+    el.addEventListener('change', () => {
+      if (el.classList.contains('body')) applyDefaults(clone);
+      if (el.classList.contains('quantity')) {
+        let v = parseInt(el.value, 10)||1;
+        if (v > 10) v = 10;
+        if (v < 1) v = 1;
+        el.value = v;
+      }
+      generate();
+    });
+  });
+
+  // Reattach duplicate/delete buttons' logic
+  clone.querySelectorAll('button').forEach(btn => {
+    if (btn.textContent.includes('Duplicate')) {
+      btn.onclick = function () { duplicateMiniature(btn); };
+    } else if (btn.textContent.includes('Delete')) {
+      btn.onclick = function () {
+        btn.closest('.miniature-input').remove();
+        generate();
+      };
+    }
+  });
+
+  original.after(clone);
+  generate();
+}
 
     async function generate() {
       const pagesDiv = document.getElementById('pages');
