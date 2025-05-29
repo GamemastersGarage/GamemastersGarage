@@ -394,7 +394,7 @@ function addMiniatureInput() {
         }
         if (m.hand2!=='None') {
           const h2 = await loadImage(`images/weapon/weapon_${m.hand2}.png`);
-          if (h2) tctx.drawImage(h2,0,0,w,h);
+          if (h2) tctx.drawImage(h2, w * -0.395, h * -0.0254, w, h);
         }
 
         if (x + w > pageW - margin) {
