@@ -327,6 +327,8 @@ function addMiniatureInput() {
       <input id="quantity" type="number" class="quantity" value="1" min="1" max="20">
     </div>
     <div class="input-row">
+      <button onclick="moveMiniature(this, -1)">⬆️</button>
+      <button onclick="moveMiniature(this, 1)">⬇️</button>
       <button onclick="duplicateMiniature(this)">📄 Duplicate</button>
       <button onclick="this.closest('.miniature-input').remove(); generate();">
         ❌ Delete
@@ -397,6 +399,34 @@ function duplicateMiniature(button) {
   generate();
 }
 
+function duplicateMiniature(button) {
+  const original = button.closest('.miniature-input');
+  const clone = original.cloneNode(true);
+
+  // Copy each input/select value from original to clone
+  const originalInputs = original.querySelectorAll('select, input');
+  const cloneInputs = clone.querySelectorAll('select, input');
+
+  originalInputs.forEach((input, index) => {
+    if (input.tagName === 'SELECT' || input.tagName === 'INPUT') {
+      cloneInputs[index].value = input.value;
+    }
+    function moveMiniature(button, direction) {
+  const current = button.closest('.miniature-input');
+  const container = document.getElementById('miniature-inputs');
+  const siblings = Array.from(container.children);
+  const index = siblings.indexOf(current);
+
+  const targetIndex = index + direction;
+
+  // Guard: don't move out of bounds
+  if (targetIndex < 0 || targetIndex >= siblings.length) return;
+
+  const referenceNode = siblings[targetIndex + (direction > 0 ? 1 : 0)];
+  container.insertBefore(current, referenceNode);
+  generate();
+}
+  });
 
     async function generate() {
       const pagesDiv = document.getElementById('pages');
