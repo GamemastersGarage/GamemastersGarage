@@ -467,7 +467,9 @@ const tmp = document.createElement('canvas');
 document.getElementById('style-toggle').onchange = updateSliders;
 document.getElementById('view-toggle').onchange = updateSliders;
 document.getElementById('grid-toggle').onchange = updateSliders;
-refreshConfigFromUI(true);
+window.onload = function() {
+  refreshConfigFromUI(true);
+};
 
 function toggleMenu() {
   document.getElementById('mainMenu').classList.toggle('active');
