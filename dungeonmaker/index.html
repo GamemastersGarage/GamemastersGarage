@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="GamemastersGarage_Logo_Favicon_V01_48x48.svg" type="image/png">
+  <title>Dungeon Export A4 PDF, Scrollable Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'League Spartan', sans-serif;
+      background-color: #f8f0e3;
+      color: #000;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Burger Menu Styles */
+    .menu-toggle {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      width: 30px;
+      height: 25px;
+      cursor: pointer;
+      z-index: 2000;
+    }
+
+    .menu-toggle span {
+      display: block;
+      height: 4px;
+      background: #000;
+      margin: 5px 0;
+      transition: 0.3s;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: #fbf6ef;
+      width: 200px;
+      height: 100vh;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+      z-index: 1500;
+      padding-top: 60px;
+      text-align: left;
+    }
+
+    nav.active {
+      transform: translateX(0);
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0 20px;
+    }
+
+    nav li {
+      margin: 20px 0;
+    }
+
+    nav a {
+      color: #000;
+      text-decoration: none;
+      font-size: 18px;
+    }
+
+    header {
+      padding: 60px 20px 40px;
+      text-align: center;
+    }
+
+    header img {
+      max-width: 150px;
+    }
+
+    h1 {
+      font-size: 2em;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+  <style>
+    html, body { height: 100%; margin: 0; }
+    body { background: #fff; min-height: 100vh; }
+#container {
+  display: flex;
+  height: 100vh;
+  padding-top: 120px; /* <-- This is the key addition */
+}
+    #controls {
+      display: flex; flex-direction: column; gap: 18px; margin: 18px 8px 0 0; min-width: 150px;
+      font-size: 15px; align-items: flex-end;
+    }
+    .slider-label { display: flex; align-items: center; gap: 10px; }
+    .slider-toggle { position: relative; width: 44px; height: 22px; }
+    .slider-toggle input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: #ccc; border-radius: 22px; transition: .3s;
+    }
+    .slider:before {
+      content: ""; position: absolute; height: 16px; width: 16px; left: 3px; bottom: 3px;
+      background: #fff; border-radius: 50%; transition: .3s;
+    }
+    input:checked + .slider { background: #134e9b; }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+.canvas-scroll {
+  flex: 1 1 0;
+  height: 100vh;
+  width: 100%;
+  min-width: 0; min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  position: relative;
+  background: #fff;
+}
+
+#dungeon {
+  display: block;
+  background: #fff;
+  box-shadow: 0 0 6px 2px #3333;
+  border-radius: 6px;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  max-width: 100vw;
+  max-height: 100vh;
+}
+
+
+  </style>
+</head>
+<body>
+<!-- Burger Toggle -->
+<div class="menu-toggle" onclick="toggleMenu()">
+  <span></span>
+  <span></span>
+  <span></span>
+</div>
+
+<!-- Navigation Menu -->
+<nav id="mainMenu">
+  <ul>
+    <li><a href="../">Manuals</a></li>
+    <li><a href="/tools/">Tools</a></li>
+    <li><a href="/mini-layout-generator/">Paper Minis Tool</a></li>
+    <li><a href="https://buymeacoffee.com/gamemastersgarage" target="_blank" rel="noopener noreferrer">Buy me a coffee</a></li>
+  </ul>
+</nav>
+
+<!-- Header -->
+<header>
+  <picture>
+    <source srcset="GamemastersGarage_Logo_WEBP_512x.webp" type="image/webp">
+    <img src="GamemastersGarage_Logo_PNG_512x.png" alt="Gamemaster's Garage Logo" width="150" />
+  </picture>
+  <h1>Dungeon Generator Tool</h1>
+</header>
+
+<div id="container">
+  <div id="controls">
+    <button id="regen">Regenerate</button>
+    <button id="export-pdf">Export to PDF</button>
+    <label for="size">Complex Size
+      <select id="size">
+        <option value="small">Small</option>
+        <option value="medium" selected>Medium</option>
+        <option value="large">Large</option>
+      </select>
+    </label>
+    <label for="density">Room Density
+      <select id="density">
+        <option value="sparse">Sparse</option>
+        <option value="normal" selected>Normal</option>
+        <option value="dense">Dense</option>
+      </select>
+    </label>
+    <label class="slider-label">Isometric
+      <span class="slider-toggle">
+        <input type="checkbox" id="view-toggle" checked>
+        <span class="slider"></span>
+      </span>
+    </label>
+    <label class="slider-label">Grid
+      <span class="slider-toggle">
+        <input type="checkbox" id="grid-toggle">
+        <span class="slider"></span>
+      </span>
+    </label>
+    <label class="slider-label">Blueprint
+      <span class="slider-toggle">
+        <input type="checkbox" id="style-toggle">
+        <span class="slider"></span>
+      </span>
+    </label>
+  </div>
+<div class="canvas-scroll" id="preview-area">
+    <canvas id="dungeon"></canvas>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const TILE = 32, GRID = 52;
+const MIN_SIZE = 3, MAX_SIZE = 8;
+let sizeValue = 'medium', densityValue = 'normal', maxRooms = 18;
+let grid = [], rooms = [], showGrid = false, isBlueprint = false, isIsometric = true;
+let previewTileSize = TILE;
+let previewIsoYOffset = 0;
+let canvasPreviewCenterX = 0;
+
+function getCanvasAndCtx() {
+  const c = document.getElementById('dungeon');
+  return {canvas: c, ctx: c.getContext('2d')};
+}
+function getViewDims() {
+  if (sizeValue === 'small') return {w: 18, h: 18, x0: 17, y0: 17};
+  if (sizeValue === 'medium') return {w: 36, h: 36, x0: 8, y0: 8};
+  return {w: 52, h: 52, x0: 0, y0: 0};
+}
+function setConfigBySize(val) {
+  if (val === "small") maxRooms = 8;
+  else if (val === "medium") maxRooms = 18;
+  else maxRooms = 30;
+}
+function setConfigByDensity(val) {
+  if (val === "sparse") maxRooms = 10;
+  else if (val === "normal") maxRooms = 18;
+  else maxRooms = 30;
+}
+function toIso(x, y) {
+  const dims = getViewDims();
+  let cx = (x - dims.x0), cy = (y - dims.y0);
+  return [
+    (cx - cy) * previewTileSize / 2 + canvasPreviewCenterX,
+    (cx + cy) * previewTileSize / 4 + previewIsoYOffset
+  ];
+}
+function toTopDown(x, y) {
+  const dims = getViewDims();
+  let cx = (x - dims.x0), cy = (y - dims.y0);
+  return [
+    cx * previewTileSize + previewTileSize,
+    cy * previewTileSize + previewTileSize
+  ];
+}
+
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function intersects(r1, r2) {
+  return !(r2.x > r1.x + r1.w || r2.x + r2.w < r1.x || r2.y > r1.y + r1.h || r2.y + r2.h < r1.y);
+}
+function createRoom() {
+  const dims = getViewDims();
+  const w = rand(MIN_SIZE, MAX_SIZE), h = rand(MIN_SIZE, MAX_SIZE);
+  const x = rand(dims.x0+1, dims.x0 + dims.w - w - 2), y = rand(dims.y0+1, dims.y0 + dims.h - h - 2);
+  return { x, y, w, h };
+}
+function markRoom(r) {
+  for (let y = r.y; y < r.y + r.h; y++)
+    for (let x = r.x; x < r.x + r.w; x++)
+      grid[y][x] = 1;
+}
+function markCorridor(from, to) {
+  const x1 = Math.floor(from.x + from.w / 2), y1 = Math.floor(from.y + from.h / 2);
+  const x2 = Math.floor(to.x + to.w / 2), y2 = Math.floor(to.y + to.h / 2);
+  let x = x1, y = y1;
+  while (x !== x2) { grid[y][x] = 1; x += x2 > x ? 1 : -1; }
+  while (y !== y2) { grid[y][x] = 1; y += y2 > y ? 1 : -1; }
+  grid[y][x] = 1;
+}
+function clearCanvas(bg) {
+  const { canvas, ctx } = getCanvasAndCtx();
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+function drawOutline(view, fgColor, dims, getCoord) {
+  const { ctx } = getCanvasAndCtx();
+  ctx.strokeStyle = fgColor; ctx.lineWidth = 2;
+  for (let y = dims.y0; y < dims.y0 + dims.h; y++) {
+    for (let x = dims.x0; x < dims.x0 + dims.w; x++) {
+      if (grid[y][x] === 1) {
+        const [x0, y0] = getCoord(x, y);
+        const [x1, y1] = getCoord(x + 1, y);
+        const [x2, y2] = getCoord(x + 1, y + 1);
+        const [x3, y3] = getCoord(x, y + 1);
+        ctx.beginPath();
+        if (y === dims.y0 || grid[y - 1][x] === 0) { ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); }
+        if (x === dims.x0 + dims.w - 1 || grid[y][x + 1] === 0) { ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); }
+        if (y === dims.y0 + dims.h - 1 || grid[y + 1][x] === 0) { ctx.moveTo(x2, y2); ctx.lineTo(x3, y3); }
+        if (x === dims.x0 || grid[y][x - 1] === 0) { ctx.moveTo(x3, y3); ctx.lineTo(x0, y0); }
+        ctx.stroke();
+      }
+    }
+  }
+}
+function drawGridOverlay(view, fgColor, dims, getCoord) {
+  const { ctx } = getCanvasAndCtx();
+  ctx.save();
+  ctx.strokeStyle = fgColor;
+  ctx.globalAlpha = 0.18; ctx.lineWidth = 1;
+  for(let y=dims.y0; y<dims.y0+dims.h; y++) {
+    for(let x=dims.x0; x<dims.x0+dims.w; x++) {
+      const [x0, y0] = getCoord(x, y), [x1, y1] = getCoord(x+1, y), [x2, y2] = getCoord(x+1, y+1), [x3, y3] = getCoord(x, y+1);
+      ctx.beginPath();
+      ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.lineTo(x2, y2); ctx.lineTo(x3, y3); ctx.closePath();
+      ctx.stroke();
+    }
+  }
+  ctx.globalAlpha = 1; ctx.restore();
+}
+function generateDungeon() {
+  grid = Array.from({ length: GRID }, () => Array(GRID).fill(0));
+  rooms = [];
+  for (let i = 0; i < maxRooms; i++) {
+    const newRoom = createRoom();
+    let failed = false;
+    for (const otherRoom of rooms) {
+      if (intersects(newRoom, otherRoom)) { failed = true; break; }
+    }
+    if (!failed) {
+      markRoom(newRoom);
+      if (rooms.length > 0) markCorridor(newRoom, rooms[rooms.length - 1]);
+      rooms.push(newRoom);
+    }
+  }
+}
+function draw() {
+  const dims = getViewDims();
+  const getCoord = isIsometric ? toIso : toTopDown;
+  if (isBlueprint) {
+    clearCanvas('#134e9b');
+    drawOutline(isIsometric, '#fff', dims, getCoord);
+    if (showGrid) drawGridOverlay(isIsometric, '#fff', dims, getCoord);
+  } else {
+    clearCanvas('#fff');
+    drawOutline(isIsometric, '#000', dims, getCoord);
+    if (showGrid) drawGridOverlay(isIsometric, '#000', dims, getCoord);
+  }
+}
+function refreshConfigFromUI(regen) {
+  sizeValue = document.getElementById('size').value;
+  densityValue = document.getElementById('density').value;
+  setConfigBySize(sizeValue); setConfigByDensity(densityValue);
+
+  const {canvas} = getCanvasAndCtx();
+  const scroll = document.querySelector('.canvas-scroll');
+  const availableWidth = scroll.clientWidth;
+  const availableHeight = scroll.clientHeight;
+
+  if (isIsometric) {
+    previewTileSize = availableWidth / (GRID + 2);
+    canvas.width = availableWidth;
+    canvas.height = availableHeight;
+    canvasPreviewCenterX = availableWidth / 2;
+    const isoTotalHeight = (GRID + 2) * previewTileSize / 2;
+    previewIsoYOffset = (availableHeight - isoTotalHeight) / 2;
+    if (previewIsoYOffset < 0) previewIsoYOffset = 0;
+  } else {
+    previewTileSize = availableHeight / (GRID + 2);
+    canvas.width = availableWidth;
+    canvas.height = availableHeight;
+    previewIsoYOffset = 0;
+    canvasPreviewCenterX = 0;
+  }
+
+  if (regen) generateDungeon();
+  draw();
+}
+
+function updateSliders() {
+  isBlueprint = document.getElementById('style-toggle').checked;
+  isIsometric = document.getElementById('view-toggle').checked;
+  showGrid = document.getElementById('grid-toggle').checked;
+  refreshConfigFromUI(false); // This will redraw AND re-scale the canvas for view mode
+}
+document.getElementById('size').onchange = function() { refreshConfigFromUI(true); };
+document.getElementById('density').onchange = function() { refreshConfigFromUI(true); };
+document.getElementById('regen').onclick = function() { generateDungeon(); draw(); };
+document.getElementById('export-pdf').onclick = function() {
+  // Full grid, scaled to fill height of A4
+ const exportHeight = Math.round(8.27 * 300);
+const exportWidth = Math.round(11.69 * 300);
+let tileExportSize;
+if (isIsometric) {
+  const isoWidth = (GRID + 2) * TILE;
+  const isoHeight = (GRID + 2) * TILE / 2;
+  const scaleW = exportWidth / isoWidth;
+  const scaleH = exportHeight / isoHeight;
+  tileExportSize = Math.floor(TILE * Math.min(scaleW, scaleH));
+} else {
+  const scaleW = exportWidth / (GRID + 2);
+  const scaleH = exportHeight / (GRID + 2);
+  tileExportSize = Math.floor(Math.min(scaleW, scaleH));
+}
+const tmp = document.createElement('canvas');
+
+  tmp.width = exportWidth; tmp.height = exportHeight;
+  const ctx = tmp.getContext('2d');
+  ctx.fillStyle = isBlueprint ? '#134e9b' : '#fff';
+  ctx.fillRect(0, 0, tmp.width, tmp.height);
+  // Center horizontally if needed
+  const x0 = (exportWidth - tileExportSize * (GRID + 2)) / 2;
+  // Drawing functions
+  function toIsoExport(x, y) {
+    let cx = x, cy = y;
+    return [
+      (cx - cy) * tileExportSize / 2 + exportWidth/2,
+      (cx + cy) * tileExportSize / 4 + 80
+    ];
+  }
+  function toTopDownExport(x, y) {
+    return [x * tileExportSize + x0, y * tileExportSize + tileExportSize];
+  }
+  const dims = {x0:0,y0:0,w:GRID,h:GRID};
+  const getCoord = isIsometric ? toIsoExport : toTopDownExport;
+  // Outline
+  ctx.save();
+  ctx.strokeStyle = isBlueprint ? '#fff' : '#000';
+  ctx.lineWidth = 2;
+  for (let y = dims.y0; y < dims.y0 + dims.h; y++) {
+    for (let x = dims.x0; x < dims.x0 + dims.w; x++) {
+      if (grid[y][x] === 1) {
+        const [x0, y0] = getCoord(x, y);
+        const [x1, y1] = getCoord(x + 1, y);
+        const [x2, y2] = getCoord(x + 1, y + 1);
+        const [x3, y3] = getCoord(x, y + 1);
+        ctx.beginPath();
+        if (y === dims.y0 || grid[y - 1][x] === 0) { ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); }
+        if (x === dims.x0 + dims.w - 1 || grid[y][x + 1] === 0) { ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); }
+        if (y === dims.y0 + dims.h - 1 || grid[y + 1][x] === 0) { ctx.moveTo(x2, y2); ctx.lineTo(x3, y3); }
+        if (x === dims.x0 || grid[y][x - 1] === 0) { ctx.moveTo(x3, y3); ctx.lineTo(x0, y0); }
+        ctx.stroke();
+      }
+    }
+  }
+  ctx.restore();
+  // Grid
+  if (showGrid) {
+    ctx.save();
+    ctx.strokeStyle = isBlueprint ? '#fff' : '#000';
+    ctx.globalAlpha = 0.18; ctx.lineWidth = 1;
+    for(let y=0; y<GRID; y++) {
+      for(let x=0; x<GRID; x++) {
+        const [x0_, y0_] = getCoord(x, y);
+        const [x1_, y1_] = getCoord(x+1, y);
+        const [x2_, y2_] = getCoord(x+1, y+1);
+        const [x3_, y3_] = getCoord(x, y+1);
+        ctx.beginPath();
+        ctx.moveTo(x0_, y0_); ctx.lineTo(x1_, y1_); ctx.lineTo(x2_, y2_); ctx.lineTo(x3_, y3_); ctx.closePath();
+        ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1; ctx.restore();
+  }
+  // PDF
+  const pdf = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+  pdf.addImage(tmp.toDataURL('image/png'), 'PNG', 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
+  window.open(pdf.output('bloburl'), '_blank');
+};
+document.getElementById('style-toggle').onchange = updateSliders;
+document.getElementById('view-toggle').onchange = updateSliders;
+document.getElementById('grid-toggle').onchange = updateSliders;
+refreshConfigFromUI(true);
+document.getElementById('export-jpgs').onclick = function() {
+  const exportHeight = Math.round(8.27 * 300);
+  const exportWidth = Math.round(11.69 * 300);
+
+const combos = [
+    { style: false, grid: true,  iso: false, name: "classic-ortho-gridded" },
+    { style: false, grid: false, iso: false, name: "classic-ortho-nogrid" },
+    { style: true,  grid: true,  iso: false, name: "blueprint-ortho-gridded" },
+    { style: true,  grid: false, iso: false, name: "blueprint-ortho-nogrid" },
+    { style: false, grid: true,  iso: true,  name: "classic-iso-gridded" },
+    { style: false, grid: false, iso: true,  name: "classic-iso-nogrid" },
+    { style: true,  grid: true,  iso: true,  name: "blueprint-iso-gridded" },
+    { style: true,  grid: false, iso: true,  name: "blueprint-iso-nogrid" }
+  ];
+  combos.forEach(c => {
+    let tileExportSize;
+    if (c.iso) {
+      const isoWidth = (GRID + 2) * TILE;
+      const isoHeight = (GRID + 2) * TILE / 2;
+      const scaleW = exportWidth / isoWidth;
+      const scaleH = exportHeight / isoHeight;
+      tileExportSize = Math.floor(TILE * Math.min(scaleW, scaleH));
+    } else {
+      const scaleW = exportWidth / (GRID + 2);
+      const scaleH = exportHeight / (GRID + 2);
+      tileExportSize = Math.floor(Math.min(scaleW, scaleH));
+    }
+    const tmp = document.createElement('canvas');
+    tmp.width = exportWidth; tmp.height = exportHeight;
+    const ctx = tmp.getContext('2d');
+    ctx.fillStyle = c.style ? '#134e9b' : '#fff';
+    ctx.fillRect(0, 0, tmp.width, tmp.height);
+
+    const x0 = (exportWidth - tileExportSize * (GRID + 2)) / 2;
+
+    function toIsoExport(x, y) {
+      let cx = x, cy = y;
+      return [
+        (cx - cy) * tileExportSize / 2 + exportWidth / 2,
+        (cx + cy) * tileExportSize / 4 + 80
+      ];
+    }
+    function toTopDownExport(x, y) {
+      return [x * tileExportSize + x0, y * tileExportSize + tileExportSize];
+    }
+    const dims = {x0:0, y0:0, w:GRID, h:GRID};
+    const getCoord = c.iso ? toIsoExport : toTopDownExport;
+
+    ctx.save();
+    ctx.strokeStyle = c.style ? '#fff' : '#000';
+    ctx.lineWidth = 2;
+    for (let y = dims.y0; y < dims.y0 + dims.h; y++) {
+      for (let x = dims.x0; x < dims.x0 + dims.w; x++) {
+        if (grid[y][x] === 1) {
+          const [x0_, y0_] = getCoord(x, y);
+          const [x1_, y1_] = getCoord(x + 1, y);
+          const [x2_, y2_] = getCoord(x + 1, y + 1);
+          const [x3_, y3_] = getCoord(x, y + 1);
+          ctx.beginPath();
+          if (y === dims.y0 || grid[y - 1][x] === 0) { ctx.moveTo(x0_, y0_); ctx.lineTo(x1_, y1_); }
+          if (x === dims.x0 + dims.w - 1 || grid[y][x + 1] === 0) { ctx.moveTo(x1_, y1_); ctx.lineTo(x2_, y2_); }
+          if (y === dims.y0 + dims.h - 1 || grid[y + 1][x] === 0) { ctx.moveTo(x2_, y2_); ctx.lineTo(x3_, y3_); }
+          if (x === dims.x0 || grid[y][x - 1] === 0) { ctx.moveTo(x3_, y3_); ctx.lineTo(x0_, y0_); }
+          ctx.stroke();
+        }
+      }
+    }
+    ctx.restore();
+
+    if (c.grid) {
+      ctx.save();
+      ctx.strokeStyle = c.style ? '#fff' : '#000';
+      ctx.globalAlpha = 0.18; ctx.lineWidth = 1;
+      for(let y=0; y<GRID; y++) {
+        for(let x=0; x<GRID; x++) {
+          const [gx0, gy0] = getCoord(x, y),
+                [gx1, gy1] = getCoord(x+1, y),
+                [gx2, gy2] = getCoord(x+1, y+1),
+                [gx3, gy3] = getCoord(x, y+1);
+          ctx.beginPath();
+          ctx.moveTo(gx0, gy0); ctx.lineTo(gx1, gy1); ctx.lineTo(gx2, gy2); ctx.lineTo(gx3, gy3); ctx.closePath();
+          ctx.stroke();
+        }
+      }
+      ctx.globalAlpha = 1; ctx.restore();
+    }
+
+    tmp.toBlob(function(blob) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+const title = document.getElementById('title').value.trim() || 'dungeon';
+a.download = title + '-' + (c.iso ? 'iso' : 'ortho') + '-' + (c.style ? 'blueprint' : 'classic') + '-' + (c.grid ? 'gridded' : 'nogrid') + '.jpg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }, 'image/jpeg', 0.98);
+  });
+};
+function toggleMenu() {
+  document.getElementById('mainMenu').classList.toggle('active');
+}
+</script>
+</body>
+</html>
