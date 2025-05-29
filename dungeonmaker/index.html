@@ -18,13 +18,15 @@
 
     /* Burger Menu Styles */
     .menu-toggle {
-      position: relative;      /* enable z-index */
-      z-index: 2000;           /* sit above nav (which is 1500) */
-      display: block;
-      width: 30px; height: 25px;
-      margin-bottom: 15px;
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      width: 30px;
+      height: 25px;
       cursor: pointer;
+      z-index: 2000;
     }
+
     .menu-toggle span {
       display: block;
       height: 4px;
