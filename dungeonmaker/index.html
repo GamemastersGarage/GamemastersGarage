@@ -468,8 +468,11 @@ document.getElementById('style-toggle').onchange = updateSliders;
 document.getElementById('view-toggle').onchange = updateSliders;
 document.getElementById('grid-toggle').onchange = updateSliders;
 window.onload = function() {
-  refreshConfigFromUI(true);
+  setTimeout(() => {
+    refreshConfigFromUI(true);
+  }, 50); // short delay to let layout settle
 };
+
 
 function toggleMenu() {
   document.getElementById('mainMenu').classList.toggle('active');
